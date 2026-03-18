@@ -1,0 +1,13 @@
+# Secrets and Keys
+*.pem
+*.key
+id_rsa
+id_ed25519
+
+# Temporary Editor Files
+*.swp
+*~
+.DS_Store
+
+# History
+.zhistory
