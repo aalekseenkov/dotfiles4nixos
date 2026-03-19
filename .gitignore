@@ -1,3 +1,7 @@
+# Installation
+nixos/hardware-configuration.nix
+result
+
 # Secrets and Keys
 *.pem
 *.key
