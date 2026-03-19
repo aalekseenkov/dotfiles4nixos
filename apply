@@ -1,4 +1,27 @@
 #!/usr/bin/env bash
-DOTFILES_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE}")" &> /dev/null && pwd)
+
+# 1. Handle missing Git: re-run script inside nix-shell if needed
+if ! command -v git &> /dev/null; then
+    echo "🤖 Git not found. Re-running inside nix-shell..."
+    exec nix-shell -p git --run "$0"
+fi
+
+# 2. Get the real user (avoids 'root' home directory issues under sudo)
+REAL_USER=${SUDO_USER:-$(logname)}
+DOTFILES_DIR="/home/$REAL_USER/.dotfiles"
+
+# 3. Link hardware config if missing in dotfiles (machine-specific)
+if [ ! -f "$DOTFILES_DIR/nixos/hardware-configuration.nix" ]; then
+    echo "📦 Copying system hardware-configuration.nix to dotfiles..."
+    cp /etc/nixos/hardware-configuration.nix "$DOTFILES_DIR/nixos/"
+fi
+
+# 4. Create a persistent symlink for future 'nixos-rebuild switch' calls
+echo "🔗 Symlinking configuration.nix to /etc/nixos/..."
 sudo ln -sf "$DOTFILES_DIR/nixos/configuration.nix" /etc/nixos/configuration.nix
+
+# 5. Apply the configuration
+echo "⚙️  Running nixos-rebuild switch..."
 sudo nixos-rebuild switch
+
+echo "✅ Done! You can now use 'sudo nixos-rebuild switch' anywhere."
