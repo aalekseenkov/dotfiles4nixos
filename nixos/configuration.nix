@@ -153,6 +153,10 @@
 
   #  --- Global environment variables ---
   environment.variables = {
+    NIX_LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [
+    stdenv.cc.cc
+    # add zlib and openssl
+  ];
     EDITOR = "hx";
     VISUAL = "hx";
   };
@@ -195,6 +199,10 @@
     dates = "weekly";
     options = "--delete-older-than 7d";
   };
+
+  # --- AUTO UPGRADE ---
+  system.autoUpgrade.enable = true;
+  system.autoUpgrade.allowReboot = false;
 
   # DO NOT CHANGE: System state version
   system.stateVersion = "24.11";
