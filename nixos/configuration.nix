@@ -1,4 +1,4 @@
-{ _config, pkgs, _lib, ... }:
+{ _config, pkgs, lib, ... }:
 
 {
   imports = [ ./hardware-configuration.nix ];
@@ -112,7 +112,15 @@
   # --- PACKAGES & PROGRAMS ---
   nixpkgs.config.allowUnfree = true;
   programs.firefox.enable = true;
-  programs.nix-ld.enable = true;
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc
+      zlib
+      fuse3
+      openssl      
+    ];
+  };  
 
   # zsh
   programs.zsh = {
@@ -152,11 +160,6 @@
   '';
 
   #  --- Global environment variables ---
-  environment.variables = {
-    NIX_LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [
-    stdenv.cc.cc
-    # add zlib and openssl
-  ];
     EDITOR = "hx";
     VISUAL = "hx";
   };
