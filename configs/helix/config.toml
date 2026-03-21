@@ -10,6 +10,9 @@ idle-timeout = 0
 true-color = true
 trim-trailing-whitespace = true
 
+# Вот правильное место для gutters в стабильной версии:
+gutters = ["diff", "diagnostics", "line-numbers"]
+
 [editor.cursor-shape]
 insert = "bar"
 normal = "block"
@@ -23,15 +26,11 @@ skip-cols = 1
 [editor.whitespace]
 render = "trailing"
 
-[editor.gutters]
-gutters = ["diff", "diagnostics", "line-numbers"]
-
 [editor.statusline]
 left = ["mode", "spinner", "file-name", "file-modification-indicator"]
 center = ["diagnostics"]
 right = ["selections", "position", "file-encoding", "file-line-ending", "file-type"]
 separator = "│"
-
 
 [editor.file-picker]
 hidden = false
