@@ -1,5 +1,6 @@
 # Installation
 nixos/hardware-configuration.nix
+nixos/local-networking.nix
 result
 
 # Secrets and Keys
