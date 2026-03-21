@@ -1,4 +1,4 @@
-{ _config, pkgs, lib, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [ ./hardware-configuration.nix ];
@@ -181,23 +181,34 @@
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
     };
   };
-  # git verification
-  system.activationScripts.gitAllowedSigners = {
-    text = ''
-      mkdir -p /home/ava/.ssh
-      echo "andrew.alekseenkov@yandex.by $(cat /home/ava/.ssh/id_ed25519.pub)" > /home/ava/.ssh/allowed_signers
-      chown ava:users /home/ava/.ssh/allowed_signers
-      chmod 600 /home/ava/.ssh/allowed_signers
-    '';
-  };
 
-  # --- LSP links for external Zed ---
-  system.activationScripts.binPaths = {
-    text = ''
+  # --- ACTIVATION SCRIPTS ---
+  system.activationScripts = {
+    # 1. Git verification
+    gitAllowedSigners.text = ''
+      mkdir -p /home/ava/.ssh
+      if [ -f /home/ava/.ssh/id_ed25519.pub ]; then
+        echo "andrew.alekseenkov@yandex.by $(cat /home/ava/.ssh/id_ed25519.pub)" > /home/ava/.ssh/allowed_signers
+        chown ava:users /home/ava/.ssh/allowed_signers
+        chmod 600 /home/ava/.ssh/allowed_signers
+      fi
+    '';
+
+    # 2. LSP links for external Zed/Editors
+    binPaths.text = ''
       mkdir -p /usr/bin
       ln -sf ${pkgs.nodejs_20}/bin/node /usr/bin/node
       ln -sf ${pkgs.ansible-language-server}/bin/ansible-language-server /usr/bin/ansible-language-server
       ln -sf ${pkgs.yaml-language-server}/bin/yaml-language-server /usr/bin/yaml-language-server
+    '';
+
+    # 3. Helix Config Symlinks
+    helixConfig.text = ''
+      USER_CONFIG="/home/ava/.config/helix"
+      mkdir -p "$USER_CONFIG"
+      ln -sf /home/ava/.dotfiles/configs/helix/config.toml "$USER_CONFIG/config.toml"
+      ln -sf /home/ava/.dotfiles/configs/helix/languages.toml "$USER_CONFIG/languages.toml"
+      chown -R ava:users /home/ava/.config
     '';
   };
 
