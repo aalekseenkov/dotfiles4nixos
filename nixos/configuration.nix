@@ -1,7 +1,10 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [ 
+    ./hardware-configuration.nix 
+    ./local-networking.nix
+  ];
 
   # --- BOOTLOADER & SYSTEM ---
   boot.loader.grub.enable = true;
@@ -97,14 +100,8 @@
 
   # --- NETWORKS ---
   networking = {
-    useDHCP = false;
-    interfaces.enp0s3.ipv4.addresses = [{
-      address = "192.168.100.100"; # Твой статический IP
-      prefixLength = 24;
-    }];
-    defaultGateway = "192.168.100.1"; # IP твоего роутера
-    nameservers = [ "8.8.8.8" "1.1.1.1" ];
-  }; 
+    networkmanager.enable = true; 
+  };
 
   # --- SSH ---
   services.openssh = {
