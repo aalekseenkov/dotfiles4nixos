@@ -3,17 +3,29 @@
 # Start the timer
 START_TIME=$SECONDS
 
-# --- GENERATE LOCAL NETWORKING CONFIG (IF MISSING) ---
+# 1. Handle missing Git first to prevent double prompts
+if ! command -v git &> /dev/null; then
+    echo "🤖 Git not found. Re-running inside nix-shell..."
+    exec nix-shell -p git --run "$0"
+fi
+
+# 2. Define paths
+REAL_USER=${SUDO_USER:-$(logname)}
+DOTFILES_DIR="/home/$REAL_USER/.dotfiles"
 NETWORK_CONFIG="$DOTFILES_DIR/nixos/local-networking.nix"
 
+# 3. Generate local-networking.nix if missing
 if [ ! -f "$NETWORK_CONFIG" ]; then
-    echo "🌐 Local networking config not found. Let's set it up:"
-    read -p "Enter interface name (e.g., enp0s3 or eth0): " IFACE
-    read -p "Enter static IP (e.g., 192.168.100.100): " IP
-    read -p "Enter gateway (e.g., 192.168.100.1): " GW
-    read -p "Enter hostname (e.g., nixos-dev): " HOST
+    echo "🌐 Local networking config not found."
+    read -p "Do you want to use STATIC IP? (y/n): " USE_STATIC
+    read -p "Enter hostname: " HOST
 
-    cat <<EOF > "$NETWORK_CONFIG"
+    if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
+        read -p "Interface (e.g. enp0s3): " IFACE
+        read -p "Static IP (e.g. 192.168.100.100): " IP
+        read -p "Gateway (e.g. 192.168.100.1): " GW
+
+        cat <<EOF > "$NETWORK_CONFIG"
 { ... }: {
   networking = {
     hostName = "$HOST";
@@ -27,41 +39,35 @@ if [ ! -f "$NETWORK_CONFIG" ]; then
   };
 }
 EOF
-    echo "✅ Created $NETWORK_CONFIG (This file is ignored by Git)"
+    else
+        cat <<EOF > "$NETWORK_CONFIG"
+{ ... }: {
+  networking = {
+    hostName = "$HOST";
+    networkmanager.enable = true;
+  };
+}
+EOF
+    fi
+    echo "✅ Created $NETWORK_CONFIG"
 fi
 
-
-# --- Handle missing Git: re-run script inside nix-shell if needed ---
-if ! command -v git &> /dev/null; then
-    echo "🤖 Git not found. Re-running inside nix-shell..."
-    exec nix-shell -p git --run "$0"
-fi
-
-# --- Get the real user (avoids 'root' home directory issues under sudo) ---
-REAL_USER=${SUDO_USER:-$(logname)}
-DOTFILES_DIR="/home/$REAL_USER/.dotfiles"
-
-# --- Link hardware config if missing in dotfiles (machine-specific) ---
+# 4. Sync hardware-configuration.nix
 if [ ! -f "$DOTFILES_DIR/nixos/hardware-configuration.nix" ]; then
     echo "📦 Copying system hardware-configuration.nix to dotfiles..."
     cp /etc/nixos/hardware-configuration.nix "$DOTFILES_DIR/nixos/"
 fi
 
-# --- Create a persistent symlink for future 'nixos-rebuild switch' calls ---
+# 5. Create symlink for configuration.nix
 echo "🔗 Symlinking configuration.nix to /etc/nixos/..."
 sudo ln -sf "$DOTFILES_DIR/nixos/configuration.nix" /etc/nixos/configuration.nix
 
-# --- Apply the configuration ---
+# 6. Apply configuration
 echo "⚙️  Running nixos-rebuild switch..."
 sudo nixos-rebuild switch
 
-# --- Calculate elapsed time ---
+# 7. Execution time
 ELAPSED=$(( SECONDS - START_TIME ))
-MIN=$(( ELAPSED / 60 ))
-SEC=$(( ELAPSED % 60 ))
-
 echo "------------------------------------------"
-echo "✅ Done! System switched successfully."
-echo "⏱️  Execution time: ${MIN}m ${SEC}s"
+echo "✅ Done! Execution time: $(( ELAPSED / 60 ))m $(( ELAPSED % 60 ))s"
 echo "------------------------------------------"
-echo "You can now use 'sudo nixos-rebuild switch' anywhere."
