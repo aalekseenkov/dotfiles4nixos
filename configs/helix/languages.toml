@@ -1,24 +1,42 @@
-# Nix config
+# --- Language Servers Definitions ---
+[language-server.nil]
+command = "nil"
+
+[language-server.ansible-ls]
+command = "ansible-language-server"
+args = ["--stdio"]
+
+[language-server.yaml-language-server]
+command = "yaml-language-server"
+args = ["--stdio"]
+
+[language-server.bash-ls]
+command = "bash-language-server"
+args = ["start"]
+
+# --- Language to Server Mapping ---
 [[language]]
 name = "nix"
-auto-format = true
-formatter = { command = "nixpkgs-fmt" }
+scope = "source.nix"
 language-servers = [ "nil" ]
 
-# Ansible & YAML
 [[language]]
 name = "yaml"
+scope = "source.yaml"
 auto-format = true
-formatter = { command = "prettier", args = ["--parser", "yaml"] } # если есть prettier
-language-servers = [ "ansible-ls", "yaml-language-server" ]
+language-servers = [ "yaml-language-server" ]
 
 [[language]]
 name = "ansible"
+scope = "source.ansible"
+file-types = ["yaml", "yml"]
+roots = ["ansible.cfg", "hosts", "inventory"]
 auto-format = true
 language-servers = [ "ansible-ls" ]
 
-# Bash
 [[language]]
 name = "bash"
+scope = "source.bash"
+file-types = ["sh", "bash"]
 auto-format = true
-language-servers = [ "bash-language-server" ]
+language-servers = [ "bash-ls" ]

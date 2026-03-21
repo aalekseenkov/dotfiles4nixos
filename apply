@@ -3,7 +3,7 @@
 # Start the timer
 START_TIME=$SECONDS
 
-# 1. Handle missing Git first
+# 1. Handle missing Git first (prevents double prompts)
 if ! command -v git &> /dev/null; then
     echo "🤖 Git not found. Re-running inside nix-shell..."
     exec nix-shell -p git --run "$0"
@@ -20,12 +20,17 @@ if [ ! -f "$NETWORK_CONFIG" ]; then
     echo "🌐 Local networking config not found."
     read -p "Do you want to use STATIC IP? (y/n): " USE_STATIC
     
+    # Defaults for VirtualBox
+    DEFAULT_IFACE="enp0s3"
+    DEFAULT_IP="192.168.100.100"
+    DEFAULT_GW="192.168.100.1"
+    DEFAULT_HOST="nixos-dev"
+
     if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
-        # Default values for VirtualBox environment
-        read -p "Interface [enp0s3]: " IFACE; IFACE=${IFACE:-enp0s3}
-        read -p "Static IP: " IP; IP=${IP:-192.168.100.100}
-        read -p "Gateway: " GW; GW=${GW:-192.168.100.1}
-        read -p "Hostname [nixos-dev]: " HOST; HOST=${HOST:-nixos-dev}
+        read -p "Interface [$DEFAULT_IFACE]: " IFACE; IFACE=${IFACE:-$DEFAULT_IFACE}
+        read -p "Static IP [$DEFAULT_IP]: " IP; IP=${IP:-$DEFAULT_IP}
+        read -p "Gateway [$DEFAULT_GW]: " GW; GW=${GW:-$DEFAULT_GW}
+        read -p "Hostname [$DEFAULT_HOST]: " HOST; HOST=${HOST:-$DEFAULT_HOST}
 
         cat <<EOF > "$NETWORK_CONFIG"
 { ... }: {
@@ -33,22 +38,25 @@ if [ ! -f "$NETWORK_CONFIG" ]; then
     hostName = "$HOST";
     firewall.allowedTCPPorts = [ 22 ];
     useDHCP = false;
-    interfaces."$IFACE".ipv4.addresses = [{
-      address = "$IP";
-      prefixLength = 24;
-    }];
+    interfaces."$IFACE" = {
+      useDHCP = false;
+      ipv4.addresses = [{
+        address = "$IP";
+        prefixLength = 24;
+      }];
+    };
     defaultGateway = "$GW";
     nameservers = [ "8.8.8.8" "1.1.1.1" ];
   };
 }
 EOF
-        # Disable default DHCP in hardware-configuration.nix with sudo
+        # Disable default DHCP in hardware-configuration.nix
         if [ -f "$HARDWARE_CONFIG" ]; then
             echo "🛠  Disabling default DHCP in hardware-configuration.nix..."
             sudo sed -i 's/networking.useDHCP/# networking.useDHCP/g' "$HARDWARE_CONFIG"
         fi
     else
-        read -p "Hostname [nixos-dev]: " HOST; HOST=${HOST:-nixos-dev}
+        read -p "Hostname [$DEFAULT_HOST]: " HOST; HOST=${HOST:-$DEFAULT_HOST}
         cat <<EOF > "$NETWORK_CONFIG"
 { ... }: {
   networking = {
@@ -62,7 +70,7 @@ EOF
     echo "✅ Created $NETWORK_CONFIG"
 fi
 
-# 4. Sync hardware-configuration.nix to dotfiles if missing
+# 4. Sync hardware-configuration.nix to dotfiles
 if [ ! -f "$HARDWARE_CONFIG" ]; then
     echo "📦 Copying system hardware-configuration.nix to dotfiles..."
     cp /etc/nixos/hardware-configuration.nix "$HARDWARE_CONFIG"
@@ -72,22 +80,11 @@ fi
 echo "🔗 Symlinking configuration.nix to /etc/nixos/..."
 sudo ln -sf "$DOTFILES_DIR/nixos/configuration.nix" /etc/nixos/configuration.nix
 
-# 6. Apply configuration
-echo "⚙️  Cleaning up network interfaces..."
-# Extract interface name from the config file if it wasn't set in this session
-if [ -z "$IFACE" ] && [ -f "$NETWORK_CONFIG" ]; then
-    IFACE=$(grep -oP 'interfaces\.\K[^.]+' "$NETWORK_CONFIG" | tr -d '"')
-fi
-if [ ! -z "$IFACE" ]; then
-    echo "🧹 Flushing interface $IFACE to prevent IP duplication..."
-    sudo ip addr flush dev "$IFACE"
-fi
-
-# 7. Apply configuration
+# 6. Apply configuration (NO MANUAL FLUSH HERE - let NixOS handle it)
 echo "⚙️  Running nixos-rebuild switch..."
 sudo nixos-rebuild switch
 
-# 8. Execution time
+# 7. Execution time
 ELAPSED=$(( SECONDS - START_TIME ))
 echo "------------------------------------------"
 echo "✅ Done! Execution time: $(( ELAPSED / 60 ))m $(( ELAPSED % 60 ))s"

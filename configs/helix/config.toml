@@ -8,9 +8,6 @@ bufferline = "multiple"
 auto-format = true
 idle-timeout = 0
 true-color = true
-trim-trailing-whitespace = true
-
-# Вот правильное место для gutters в стабильной версии:
 gutters = ["diff", "diagnostics", "line-numbers"]
 
 [editor.cursor-shape]
@@ -18,18 +15,18 @@ insert = "bar"
 normal = "block"
 select = "underline"
 
-[editor.indent-guides]
-render = true
-character = "╎"
-skip-cols = 1
-
 [editor.whitespace]
-render = "trailing"
+render = "all"
+
+[editor.whitespace.characters]
+space = " "
+newline = " "
+tab = "→"      # Виден только TAB
+trailing = "·" # Видны только пробелы в конце
 
 [editor.statusline]
-left = ["mode", "spinner", "file-name", "file-modification-indicator"]
-center = ["diagnostics"]
-right = ["selections", "position", "file-encoding", "file-line-ending", "file-type"]
+left = ["mode", "file-name", "file-modification-indicator"]
+right = ["position", "file-type"]
 separator = "│"
 
 [editor.file-picker]
