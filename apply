@@ -73,10 +73,21 @@ echo "🔗 Symlinking configuration.nix to /etc/nixos/..."
 sudo ln -sf "$DOTFILES_DIR/nixos/configuration.nix" /etc/nixos/configuration.nix
 
 # 6. Apply configuration
+echo "⚙️  Cleaning up network interfaces..."
+# Extract interface name from the config file if it wasn't set in this session
+if [ -z "$IFACE" ] && [ -f "$NETWORK_CONFIG" ]; then
+    IFACE=$(grep -oP 'interfaces\.\K[^.]+' "$NETWORK_CONFIG" | tr -d '"')
+fi
+if [ ! -z "$IFACE" ]; then
+    echo "🧹 Flushing interface $IFACE to prevent IP duplication..."
+    sudo ip addr flush dev "$IFACE"
+fi
+
+# 7. Apply configuration
 echo "⚙️  Running nixos-rebuild switch..."
 sudo nixos-rebuild switch
 
-# 7. Execution time
+# 8. Execution time
 ELAPSED=$(( SECONDS - START_TIME ))
 echo "------------------------------------------"
 echo "✅ Done! Execution time: $(( ELAPSED / 60 ))m $(( ELAPSED % 60 ))s"
