@@ -3,31 +3,59 @@
 # Start the timer
 START_TIME=$SECONDS
 
-# 1. Handle missing Git: re-run script inside nix-shell if needed
+# --- GENERATE LOCAL NETWORKING CONFIG (IF MISSING) ---
+NETWORK_CONFIG="$DOTFILES_DIR/nixos/local-networking.nix"
+
+if [ ! -f "$NETWORK_CONFIG" ]; then
+    echo "🌐 Local networking config not found. Let's set it up:"
+    read -p "Enter interface name (e.g., enp0s3 or eth0): " IFACE
+    read -p "Enter static IP (e.g., 192.168.100.100): " IP
+    read -p "Enter gateway (e.g., 192.168.100.1): " GW
+    read -p "Enter hostname (e.g., nixos-dev): " HOST
+
+    cat <<EOF > "$NETWORK_CONFIG"
+{ ... }: {
+  networking = {
+    hostName = "$HOST";
+    useDHCP = false;
+    interfaces."$IFACE".ipv4.addresses = [{
+      address = "$IP";
+      prefixLength = 24;
+    }];
+    defaultGateway = "$GW";
+    nameservers = [ "8.8.8.8" "1.1.1.1" ];
+  };
+}
+EOF
+    echo "✅ Created $NETWORK_CONFIG (This file is ignored by Git)"
+fi
+
+
+# --- Handle missing Git: re-run script inside nix-shell if needed ---
 if ! command -v git &> /dev/null; then
     echo "🤖 Git not found. Re-running inside nix-shell..."
     exec nix-shell -p git --run "$0"
 fi
 
-# 2. Get the real user (avoids 'root' home directory issues under sudo)
+# --- Get the real user (avoids 'root' home directory issues under sudo) ---
 REAL_USER=${SUDO_USER:-$(logname)}
 DOTFILES_DIR="/home/$REAL_USER/.dotfiles"
 
-# 3. Link hardware config if missing in dotfiles (machine-specific)
+# --- Link hardware config if missing in dotfiles (machine-specific) ---
 if [ ! -f "$DOTFILES_DIR/nixos/hardware-configuration.nix" ]; then
     echo "📦 Copying system hardware-configuration.nix to dotfiles..."
     cp /etc/nixos/hardware-configuration.nix "$DOTFILES_DIR/nixos/"
 fi
 
-# 4. Create a persistent symlink for future 'nixos-rebuild switch' calls
+# --- Create a persistent symlink for future 'nixos-rebuild switch' calls ---
 echo "🔗 Symlinking configuration.nix to /etc/nixos/..."
 sudo ln -sf "$DOTFILES_DIR/nixos/configuration.nix" /etc/nixos/configuration.nix
 
-# 5. Apply the configuration
+# --- Apply the configuration ---
 echo "⚙️  Running nixos-rebuild switch..."
 sudo nixos-rebuild switch
 
-# Calculate elapsed time
+# --- Calculate elapsed time ---
 ELAPSED=$(( SECONDS - START_TIME ))
 MIN=$(( ELAPSED / 60 ))
 SEC=$(( ELAPSED % 60 ))
