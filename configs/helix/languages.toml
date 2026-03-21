@@ -1,0 +1,24 @@
+# Nix config
+[[language]]
+name = "nix"
+auto-format = true
+formatter = { command = "nixpkgs-fmt" }
+language-servers = [ "nil" ]
+
+# Ansible & YAML
+[[language]]
+name = "yaml"
+auto-format = true
+formatter = { command = "prettier", args = ["--parser", "yaml"] } # если есть prettier
+language-servers = [ "ansible-ls", "yaml-language-server" ]
+
+[[language]]
+name = "ansible"
+auto-format = true
+language-servers = [ "ansible-ls" ]
+
+# Bash
+[[language]]
+name = "bash"
+auto-format = true
+language-servers = [ "bash-language-server" ]
