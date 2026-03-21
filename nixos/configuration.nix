@@ -64,6 +64,10 @@
   # --- HARDWARE & VIRTUALIZATION ---
   virtualisation.virtualbox.guest.enable = true;
   virtualisation.virtualbox.guest.dragAndDrop = true;
+  
+  # --- ZRAM
+  zramSwap.enable = true;
+  zramSwap.memoryPercent = 50;
 
   # --- DOCKER ---
   virtualisation.docker.enable = true;
