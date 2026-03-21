@@ -29,6 +29,7 @@ if [ ! -f "$NETWORK_CONFIG" ]; then
 { ... }: {
   networking = {
     hostName = "$HOST";
+    firewall.allowedTCPPorts = [ 22 ];
     useDHCP = false;
     interfaces."$IFACE".ipv4.addresses = [{
       address = "$IP";
@@ -44,6 +45,7 @@ EOF
 { ... }: {
   networking = {
     hostName = "$HOST";
+    firewall.allowedTCPPorts = [ 22 ];
     networkmanager.enable = true;
   };
 }
