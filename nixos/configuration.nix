@@ -55,6 +55,20 @@
     serviceConfig.Type = "oneshot";
   };
 
+  # --- GNOME POWER & LOCK SETTINGS ---
+  systemd.user.services.configure-gnome-power = {
+    script = ''
+      # Disable screen blanking (monitor turn off)
+      ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/session/idle-delay "uint32 0"
+      # Disable automatic suspend on AC
+      ${pkgs.dconf}/bin/dconf write /org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type "'nothing'"
+      # Disable screen lock
+      ${pkgs.dconf}/bin/dconf write /org/gnome/desktop/screensaver/lock-enabled "false"
+    '';
+    wantedBy = [ "graphical-session.target" ];
+    serviceConfig.Type = "oneshot";
+  };
+
   # --- FONTS ---
   # Installing only JetBrainsMono Nerd Font
   fonts.packages = with pkgs; [
