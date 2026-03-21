@@ -11,8 +11,6 @@
   boot.loader.grub.device = "/dev/sda"; # Adjust if your disk is different
   boot.loader.grub.useOSProber = true;
 
-  networking.hostName = "nixos";
-  networking.networkmanager.enable = true;
   time.timeZone = "Europe/Minsk";
 
   # --- LOCALIZATION & LANGUAGES ---
@@ -98,11 +96,6 @@
     pulse.enable = true;
   };
 
-  # --- NETWORKS ---
-  networking = {
-    networkmanager.enable = true; 
-  };
-
   # --- SSH ---
   services.openssh = {
     enable = true;
@@ -111,9 +104,6 @@
       PermitRootLogin = "yes"; 
     };
   };
-
-  # --- FIREWALL ---
-  networking.firewall.allowedTCPPorts = [ 22 ];
   
   # --- USER ACCOUNT ---
   nix.settings.trusted-users = [ "root" "ava" ];
