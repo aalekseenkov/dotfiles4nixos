@@ -24,10 +24,10 @@
     LC_MEASUREMENT = "ru_RU.UTF-8";
   };
 
-  # Keyboard layouts: US and RU, toggle with Alt+Shift
+  # Keyboard layouts: US and RU, toggle with Alt+Shift, CapsLock to Ctrl
   services.xserver.xkb = {
     layout = "us,ru";
-    options = "grp:alt_shift_toggle";
+    options = "grp:alt_shift_toggle,ctrl:nocaps";
   };
 
   # Apply XKB settings to the TTY/Console
