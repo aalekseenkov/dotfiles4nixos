@@ -160,6 +160,7 @@
   '';
 
   #  --- Global environment variables ---
+  environment.variables = {
     EDITOR = "hx";
     VISUAL = "hx";
   };
