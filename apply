@@ -15,24 +15,17 @@ DOTFILES_DIR="/home/$REAL_USER/.dotfiles"
 NETWORK_CONFIG="$DOTFILES_DIR/nixos/local-networking.nix"
 HARDWARE_CONFIG="$DOTFILES_DIR/nixos/hardware-configuration.nix"
 
-# 3. Generate local-networking.nix if missing
-if [ ! -f "$NETWORK_CONFIG" ]; then
-    echo "🌐 Local networking config not found."
-    read -p "Do you want to use STATIC IP? (y/n): " USE_STATIC
-    
-    # Defaults for VirtualBox
-    DEFAULT_IFACE="enp0s3"
-    DEFAULT_IP="192.168.100.100"
-    DEFAULT_GW="192.168.100.1"
-    DEFAULT_HOST="nixos-dev"
+# 3. Generate local-networking.nix
+echo "🌐 Configuring network (Press Enter for defaults):"
+read -p "Use STATIC IP? (y/n) [y]: " USE_STATIC; USE_STATIC=${USE_STATIC:-y}
+read -p "Hostname [nixos-dev]: " HOST; HOST=${HOST:-nixos-dev}
+read -p "Interface [enp0s3]: " IFACE; IFACE=${IFACE:-enp0s3}
 
-    if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
-        read -p "Interface [$DEFAULT_IFACE]: " IFACE; IFACE=${IFACE:-$DEFAULT_IFACE}
-        read -p "Static IP [$DEFAULT_IP]: " IP; IP=${IP:-$DEFAULT_IP}
-        read -p "Gateway [$DEFAULT_GW]: " GW; GW=${GW:-$DEFAULT_GW}
-        read -p "Hostname [$DEFAULT_HOST]: " HOST; HOST=${HOST:-$DEFAULT_HOST}
+if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
+    read -p "Static IP: " IP; IP=${IP:-192.168.100.100}
+    read -p "Gateway: " GW; GW=${GW:-192.168.100.1}
 
-        cat <<EOF > "$NETWORK_CONFIG"
+    cat <<EOF > "$NETWORK_CONFIG"
 { ... }: {
   networking = {
     hostName = "$HOST";
@@ -40,51 +33,46 @@ if [ ! -f "$NETWORK_CONFIG" ]; then
     useDHCP = false;
     interfaces."$IFACE" = {
       useDHCP = false;
-      ipv4.addresses = [{
-        address = "$IP";
-        prefixLength = 24;
-      }];
+      ipv4.addresses = [{ address = "$IP"; prefixLength = 24; }];
     };
     defaultGateway = "$GW";
     nameservers = [ "8.8.8.8" "1.1.1.1" ];
   };
 }
 EOF
-        # Disable default DHCP in hardware-configuration.nix
-        if [ -f "$HARDWARE_CONFIG" ]; then
-            echo "🛠  Disabling default DHCP in hardware-configuration.nix..."
-            sudo sed -i 's/networking.useDHCP/# networking.useDHCP/g' "$HARDWARE_CONFIG"
-        fi
-    else
-        read -p "Hostname [$DEFAULT_HOST]: " HOST; HOST=${HOST:-$DEFAULT_HOST}
-        cat <<EOF > "$NETWORK_CONFIG"
+    # Disable default DHCP in hardware-configuration.nix with sudo
+    if [ -f "$HARDWARE_CONFIG" ]; then
+        sudo sed -i 's/networking.useDHCP/# networking.useDHCP/g' "$HARDWARE_CONFIG"
+    fi
+else
+    # Clean DHCP Path: Explicitly empty old static addresses
+    cat <<EOF > "$NETWORK_CONFIG"
 { ... }: {
   networking = {
     hostName = "$HOST";
     firewall.allowedTCPPorts = [ 22 ];
     networkmanager.enable = true;
+    interfaces."$IFACE".ipv4.addresses = [ ]; 
   };
 }
 EOF
-    fi
-    echo "✅ Created $NETWORK_CONFIG"
 fi
 
-# 4. Sync hardware-configuration.nix to dotfiles
-if [ ! -f "$HARDWARE_CONFIG" ]; then
-    echo "📦 Copying system hardware-configuration.nix to dotfiles..."
-    cp /etc/nixos/hardware-configuration.nix "$HARDWARE_CONFIG"
-fi
+# 4. Sync hardware-configuration.nix
+[ ! -f "$HARDWARE_CONFIG" ] && cp /etc/nixos/hardware-configuration.nix "$HARDWARE_CONFIG"
 
-# 5. Create system symlink
-echo "🔗 Symlinking configuration.nix to /etc/nixos/..."
+# 5. System Symlink
 sudo ln -sf "$DOTFILES_DIR/nixos/configuration.nix" /etc/nixos/configuration.nix
 
-# 6. Apply configuration (NO MANUAL FLUSH HERE - let NixOS handle it)
+# 6. Apply configuration
 echo "⚙️  Running nixos-rebuild switch..."
 sudo nixos-rebuild switch
 
-# 7. Execution time
+# 7. CLEANUP: Force network stack to drop old states and pick up new config
+echo "🔄 Restarting network-setup to clear IP duplication..."
+sudo systemctl restart network-setup.service
+
+# 8. Execution time
 ELAPSED=$(( SECONDS - START_TIME ))
 echo "------------------------------------------"
 echo "✅ Done! Execution time: $(( ELAPSED / 60 ))m $(( ELAPSED % 60 ))s"
