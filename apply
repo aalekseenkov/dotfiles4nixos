@@ -77,3 +77,17 @@ ELAPSED=$(( SECONDS - START_TIME ))
 echo "------------------------------------------"
 echo "✅ Done! Execution time: $(( ELAPSED / 60 ))m $(( ELAPSED % 60 ))s"
 echo "------------------------------------------"
+
+# --- POST-APPLY NETWORK FIX ---
+# We check if the network config was updated during this run
+if [[ "$USE_STATIC" =~ ^[Yy]$ ]] || [ "$OLD_HOST" != "$HOST" ]; then
+    echo "⚠️  Network configuration changed."
+    read -p "REBOOT NOW to apply clean network state? (y/n) [y]: " REBOOT_NOW
+    REBOOT_NOW=${REBOOT_NOW:-y}
+    
+    if [[ "$REBOOT_NOW" =~ ^[Yy]$ ]]; then
+        echo "🚀 Rebooting in 3 seconds..."
+        sleep 3
+        sudo reboot
+    fi
+fi
