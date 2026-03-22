@@ -1,8 +1,8 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports = [ 
-    ./hardware-configuration.nix 
+  imports = [
+    ./hardware-configuration.nix
     ./local-networking.nix
   ];
 
@@ -33,7 +33,7 @@
   # Apply XKB settings to the TTY/Console
   console = {
     font = "Lat2-Terminus16";
-    useXkbConfig = true; 
+    useXkbConfig = true;
   };
 
   # --- DESKTOP ENVIRONMENT (GNOME) ---
@@ -73,13 +73,13 @@
   # --- FONTS ---
   # Installing only JetBrainsMono Nerd Font
   fonts.packages = with pkgs; [
-    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    nerd-fonts.jetbrains-mono
   ];
 
   # --- HARDWARE & VIRTUALIZATION ---
   virtualisation.virtualbox.guest.enable = true;
   virtualisation.virtualbox.guest.dragAndDrop = true;
-  
+
   # --- ZRAM
   zramSwap.enable = true;
   zramSwap.memoryPercent = 50;
@@ -101,10 +101,10 @@
     enable = true;
     settings = {
       PasswordAuthentication = true;
-      PermitRootLogin = "yes"; 
+      PermitRootLogin = "yes";
     };
   };
-  
+
   # --- USER ACCOUNT ---
   nix.settings.trusted-users = [ "root" "ava" ];
   users.users.ava = {
@@ -123,9 +123,9 @@
       stdenv.cc.cc
       zlib
       fuse3
-      openssl      
+      openssl
     ];
-  };  
+  };
 
   # zsh
   programs.zsh = {
@@ -133,6 +133,17 @@
     enableCompletion = true;
     autosuggestions.enable = true;
     syntaxHighlighting.enable = true;
+
+    # Initialize Starship for Zsh
+    promptInit = ''
+      eval "$(${pkgs.starship}/bin/starship init zsh)"
+    '';
+
+    shellAliases = {
+      apply = "time ~/.dotfiles/nixos/apply";
+      v = "hx";
+      y = "yazi";
+    };
   };
 
   environment.systemPackages = with pkgs; [
@@ -159,11 +170,6 @@
     dconf   # Required for the keyboard script
   ];
 
-  # starship by default
-  programs.zsh.interactiveShellInit = ''
-    eval "$(starship init zsh)"
-  '';
-
   #  --- Global environment variables ---
   environment.variables = {
     EDITOR = "hx";
@@ -185,6 +191,7 @@
 
   # --- ACTIVATION SCRIPTS ---
   system.activationScripts = {
+
     # 1. Git verification
     gitAllowedSigners.text = ''
       mkdir -p /home/ava/.ssh
@@ -202,14 +209,24 @@
       ln -sf ${pkgs.ansible-language-server}/bin/ansible-language-server /usr/bin/ansible-language-server
       ln -sf ${pkgs.yaml-language-server}/bin/yaml-language-server /usr/bin/yaml-language-server
     '';
+    # Combined user configuration symlinks
+    userConfigs.text = ''
+      DOTS="/home/ava/.dotfiles/configs"
+      CONF="/home/ava/.config"
 
-    # 3. Helix Config Symlinks
-    helixConfig.text = ''
-      USER_CONFIG="/home/ava/.config/helix"
-      mkdir -p "$USER_CONFIG"
-      ln -sf /home/ava/.dotfiles/configs/helix/config.toml "$USER_CONFIG/config.toml"
-      ln -sf /home/ava/.dotfiles/configs/helix/languages.toml "$USER_CONFIG/languages.toml"
-      chown -R ava:users /home/ava/.config
+      mkdir -p "$CONF/helix" "$CONF/starship" "$CONF/yazi"
+
+      # Helix
+      ln -sf "$DOTS/helix/config.toml" "$CONF/helix/config.toml"
+      ln -sf "$DOTS/helix/languages.toml" "$CONF/helix/languages.toml"
+
+      # Starship
+      ln -sf "$DOTS/starship/starship.toml" "$CONF/starship.toml"
+
+      # Yazi
+      ln -sf "$DOTS/yazi/yazi.toml" "$CONF/yazi/yazi.toml"
+
+      chown -R ava:users "$CONF"
     '';
   };
 

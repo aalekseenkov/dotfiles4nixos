@@ -1,0 +1,18 @@
+# English SRE Config
+format = """$directory$git_branch$git_status$nix_shell$character"""
+
+[directory]
+style = "bold blue"
+truncation_length = 3
+
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[➜](bold red)"
+
+[nix_shell]
+symbol = "❄️ "
+format = "via [$symbol]($style) "
+
+[git_branch]
+symbol = "🌱 "
+style = "bold purple"
