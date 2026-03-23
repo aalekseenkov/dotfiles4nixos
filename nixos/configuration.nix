@@ -148,13 +148,13 @@
 
   environment.systemPackages = with pkgs; [
     git
-    nodejs_20
+    nodejs
     starship
     ansible
     docker-compose
     # lsp
     bash-language-server
-    ansible-language-server
+    # ansible-language-server-bin
     yaml-language-server
     nil
     marksman
@@ -205,11 +205,12 @@
     # 2. LSP links for external Zed/Editors
     binPaths.text = ''
       mkdir -p /usr/bin
-      ln -sf ${pkgs.nodejs_20}/bin/node /usr/bin/node
-      ln -sf ${pkgs.ansible-language-server}/bin/ansible-language-server /usr/bin/ansible-language-server
+      ln -sf ${pkgs.nodejs}/bin/node /usr/bin/node
+      ln -sf ${pkgs.ansible-lint}/bin/ansible-lint /usr/bin/ansible-language-server
       ln -sf ${pkgs.yaml-language-server}/bin/yaml-language-server /usr/bin/yaml-language-server
     '';
-    # Combined user configuration symlinks
+
+    # 3. Combined user configuration symlinks
     userConfigs.text = ''
       DOTS="/home/ava/.dotfiles/configs"
       CONF="/home/ava/.config"
@@ -242,5 +243,5 @@
   system.autoUpgrade.allowReboot = false;
 
   # DO NOT CHANGE: System state version
-  system.stateVersion = "24.11";
+  system.stateVersion = "25.11";
 }
