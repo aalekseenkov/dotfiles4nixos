@@ -1,42 +1,40 @@
-# --- Language Servers Definitions ---
-[language-server.nil]
-command = "nil"
-
-[language-server.ansible-ls]
-command = "ansible-language-server"
-args = ["--stdio"]
-
 [language-server.yaml-language-server]
 command = "yaml-language-server"
 args = ["--stdio"]
+
+# Настройка схем без обращения к интернету
+[language-server.yaml-language-server.config.yaml]
+format = { enable = true }
+validate = true
+# Указываем встроенный тип схемы
+schemas = { "ansible" = ["playbook.yml", "roles/*.yml", "tasks/*.yml", "hosts.yml"] }
+
+[language-server.nil]
+command = "nil"
 
 [language-server.bash-ls]
 command = "bash-language-server"
 args = ["start"]
 
-# --- Language to Server Mapping ---
-[[language]]
-name = "nix"
-scope = "source.nix"
-language-servers = [ "nil" ]
-
-[[language]]
-name = "yaml"
-scope = "source.yaml"
-auto-format = true
-language-servers = [ "yaml-language-server" ]
-
 [[language]]
 name = "ansible"
 scope = "source.ansible"
 file-types = ["yaml", "yml"]
-roots = ["ansible.cfg", "hosts", "inventory"]
+roots = ["ansible.cfg", "playbook.yml", "hosts", "inventory"]
 auto-format = true
-language-servers = [ "ansible-ls" ]
+# Один сервер на все случаи жизни
+language-servers = [ { name = "yaml-language-server" } ]
+
+[[language]]
+name = "yaml"
+scope = "source.yaml"
+file-types = ["json"] 
+auto-format = true
+language-servers = [ { name = "yaml-language-server" } ]
 
 [[language]]
 name = "bash"
 scope = "source.bash"
 file-types = ["sh", "bash"]
 auto-format = true
-language-servers = [ "bash-ls" ]
+language-servers = [ { name = "bash-ls" } ]
