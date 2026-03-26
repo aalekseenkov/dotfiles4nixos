@@ -1,13 +1,13 @@
+[language-server.ansible-ls]
+command = "ansible-language-server"
+args = ["--stdio"]
+# Passing path to ansible-lint for local schema validation without internet
+config = { ansible = { lint = { enabled = true, path = "ansible-lint" } } }
+
 [language-server.yaml-language-server]
 command = "yaml-language-server"
 args = ["--stdio"]
-
-# Настройка схем без обращения к интернету
-[language-server.yaml-language-server.config.yaml]
-format = { enable = true }
-validate = true
-# Указываем встроенный тип схемы
-schemas = { "ansible" = ["playbook.yml", "roles/*.yml", "tasks/*.yml", "hosts.yml"] }
+config = { yaml = { format = { enable = true }, validate = true, schemas = { "kubernetes" = "*.yaml" } } }
 
 [language-server.nil]
 command = "nil"
@@ -19,11 +19,11 @@ args = ["start"]
 [[language]]
 name = "ansible"
 scope = "source.ansible"
-file-types = ["yaml", "yml"]
-roots = ["ansible.cfg", "playbook.yml", "hosts", "inventory"]
+file-types = ["yml", "yaml"]
+roots = ["ansible.cfg", "playbook.yml", "hosts", "inventory", ".ansible-lint"]
 auto-format = true
-# Один сервер на все случаи жизни
-language-servers = [ { name = "yaml-language-server" } ]
+# Use specialized ansible-ls instead of generic yaml-ls
+language-servers = [ { name = "ansible-ls" } ]
 
 [[language]]
 name = "yaml"

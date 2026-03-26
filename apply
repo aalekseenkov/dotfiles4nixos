@@ -1,35 +1,25 @@
 #!/usr/bin/env bash
 
-# Start the timer
-START_TIME=$SECONDS
-
-# 1. Handle missing Git first (prevents double prompts)
-if ! command -v git &> /dev/null; then
-    echo "🤖 Git not found. Re-running inside nix-shell..."
-    exec nix-shell -p git --run "$0"
-fi
-
-# 2. Define paths
+# 1. Define paths
 REAL_USER=${SUDO_USER:-$(logname)}
 DOTFILES_DIR="/home/$REAL_USER/.dotfiles"
 NETWORK_CONFIG="$DOTFILES_DIR/nixos/local-networking.nix"
 HARDWARE_CONFIG="$DOTFILES_DIR/nixos/hardware-configuration.nix"
 
-# 3. Generate local-networking.nix
-echo "🌐 Configuring network (Press Enter for defaults):"
+# 2. Network config generation
+echo "🌐 Network Setup:"
 read -p "Use STATIC IP? (y/n) [y]: " USE_STATIC; USE_STATIC=${USE_STATIC:-y}
-read -p "Hostname [nixos-dev]: " HOST; HOST=${HOST:-nixos-dev}
+read -p "Hostname [nixos]: " HOST; HOST=${HOST:-nixos}
 read -p "Interface [enp0s3]: " IFACE; IFACE=${IFACE:-enp0s3}
 
 if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
-    read -p "Static IP: " IP; IP=${IP:-192.168.100.100}
-    read -p "Gateway: " GW; GW=${GW:-192.168.100.1}
-
+    read -p "IP: " IP; IP=${IP:-192.168.100.100}
+    read -p "GW: " GW; GW=${GW:-192.168.100.1}
     cat <<EOF > "$NETWORK_CONFIG"
 { ... }: {
   networking = {
     hostName = "$HOST";
-    firewall.allowedTCPPorts = [ 22 ];
+    firewall.allowedTCPPorts = [ 22 80 443 ]; # SSH + HTTP/S для тестов
     useDHCP = false;
     interfaces."$IFACE" = {
       useDHCP = false;
@@ -40,12 +30,7 @@ if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
   };
 }
 EOF
-    # Disable default DHCP in hardware-configuration.nix with sudo
-    if [ -f "$HARDWARE_CONFIG" ]; then
-        sudo sed -i 's/networking.useDHCP/# networking.useDHCP/g' "$HARDWARE_CONFIG"
-    fi
 else
-    # Clean DHCP Path: Explicitly empty old static addresses
     cat <<EOF > "$NETWORK_CONFIG"
 { ... }: {
   networking = {
@@ -58,36 +43,47 @@ else
 EOF
 fi
 
-# 4. Sync hardware-configuration.nix
+if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
+    read -p "IP: " IP; IP=${IP:-192.168.100.100}
+    read -p "GW: " GW; GW=${GW:-192.168.100.1}
+    cat <<EOF > "$NETWORK_CONFIG"
+{ ... }: {
+  networking = {
+    hostName = "$HOST";
+    useDHCP = false;
+    interfaces."$IFACE".ipv4.addresses = [{ address = "$IP"; prefixLength = 24; }];
+    defaultGateway = "$GW";
+    nameservers = [ "8.8.8.8" "1.1.1.1" ];
+  };
+}
+EOF
+else
+    cat <<EOF > "$NETWORK_CONFIG"
+{ ... }: {
+  networking = { hostName = "$HOST"; useDHCP = true; };
+}
+EOF
+fi
+
+# 3. Hardware Sync
 [ ! -f "$HARDWARE_CONFIG" ] && cp /etc/nixos/hardware-configuration.nix "$HARDWARE_CONFIG"
 
-# 5. System Symlink
-sudo ln -sf "$DOTFILES_DIR/nixos/configuration.nix" /etc/nixos/configuration.nix
+# 4. GIT MAGIC (Intent-to-add)
+# This makes Nix see files even if they are in .gitignore
+echo "📦 Adding local files to Git index (temporary)..."
+git -C "$DOTFILES_DIR" add -f "$NETWORK_CONFIG" "$HARDWARE_CONFIG"
 
-# 6. Apply configuration
-echo "⚙️  Running nixos-rebuild switch..."
-sudo nixos-rebuild switch
+# 5. Git Safety Magic (SRE Style)
+# We tell Git: "Keep these files in the repo, but IGNORE any local changes in them"
+echo "🛡️  Freezing local configs in Git index..."
+git -C "$DOTFILES_DIR" update-index --assume-unchanged "$NETWORK_CONFIG" 2>/dev/null
+git -C "$DOTFILES_DIR" update-index --assume-unchanged "$HARDWARE_CONFIG" 2>/dev/null
 
-# 7. CLEANUP: Force network stack to drop old states and pick up new config
-echo "🔄 Restarting network-setup to clear IP duplication..."
+# 6. Apply with Flake
+echo "⚙️  Rebuilding system..."
+sudo nixos-rebuild switch --flake "$DOTFILES_DIR#$HOST"
+
+# 7. Cleanup network
 sudo systemctl restart network-setup.service
+echo "✅ Done! System: $HOST"
 
-# 8. Execution time
-ELAPSED=$(( SECONDS - START_TIME ))
-echo "------------------------------------------"
-echo "✅ Done! Execution time: $(( ELAPSED / 60 ))m $(( ELAPSED % 60 ))s"
-echo "------------------------------------------"
-
-# --- POST-APPLY NETWORK FIX ---
-# We check if the network config was updated during this run
-if [[ "$USE_STATIC" =~ ^[Yy]$ ]] || [ "$OLD_HOST" != "$HOST" ]; then
-    echo "⚠️  Network configuration changed."
-    read -p "REBOOT NOW to apply clean network state? (y/n) [y]: " REBOOT_NOW
-    REBOOT_NOW=${REBOOT_NOW:-y}
-    
-    if [[ "$REBOOT_NOW" =~ ^[Yy]$ ]]; then
-        echo "🚀 Rebooting in 3 seconds..."
-        sleep 3
-        sudo reboot
-    fi
-fi

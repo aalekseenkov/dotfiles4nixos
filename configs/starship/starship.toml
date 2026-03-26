@@ -1,18 +1,33 @@
-# English SRE Config
-format = """$directory$git_branch$git_status$nix_shell$character"""
+# Get editor-friendly prompts
+format = """
+[┌───────────────────](bold green)
+[│](bold green) $directory$git_branch$git_status
+[└─](bold green) $character"""
+
+# Disable modules that cause "Permission denied" or slowness
+[package]
+disabled = true
+[nodejs]
+disabled = true
+[python]
+disabled = true
+[aws]
+disabled = true
 
 [directory]
-style = "bold blue"
-truncation_length = 3
-
-[character]
-success_symbol = "[➜](bold green)"
-error_symbol = "[➜](bold red)"
-
-[nix_shell]
-symbol = "❄️ "
-format = "via [$symbol]($style) "
+style = "bold cyan"
+truncate_to_repo = true
+truncation_symbol = "…/"
 
 [git_branch]
 symbol = "🌱 "
-style = "bold purple"
+style = "bold green"
+
+[git_status]
+style = "bold red"
+format = "([\\[$all_status$ahead_behind\\]]($style) )"
+
+[character]
+success_symbol = "[λ](bold green)"
+error_symbol = "[λ](bold red)"
+

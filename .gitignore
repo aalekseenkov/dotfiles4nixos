@@ -1,18 +1,22 @@
-# Installation
-nixos/hardware-configuration.nix
-nixos/local-networking.nix
-result
-
-# Secrets and Keys
+# --- Local machine-specific configs (STRICT) ---
+# --- Secrets and Keys (CRITICAL) ---
 *.pem
 *.key
 id_rsa
 id_ed25519
+id_rsa.pub
+id_ed25519.pub
+known_hosts
+authorized_keys
 
-# Temporary Editor Files
+# --- Temporary Editor Files ---
 *.swp
 *~
 .DS_Store
+.netrc
 
-# History
-.zhistory
+# --- Nix Build Artifacts ---
+result
+result-*
+
+# --- NOTE: flake.lock is NOT ignored (it must be committed for reproducibility) ---
