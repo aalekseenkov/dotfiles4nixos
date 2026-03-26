@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+# 1. Define paths
+REAL_USER=${SUDO_USER:-$(logname)}
+DOTFILES_DIR="/home/$REAL_USER/.dotfiles"
+NETWORK_CONFIG="$DOTFILES_DIR/nixos/local-networking.nix"
+HARDWARE_CONFIG="$DOTFILES_DIR/nixos/hardware-configuration.nix"
+
+# 2. Network config generation
+echo "🌐 Network Setup:"
+read -p "Use STATIC IP? (y/n) [y]: " USE_STATIC; USE_STATIC=${USE_STATIC:-y}
+read -p "Hostname [nixos]: " HOST; HOST=${HOST:-nixos}
+read -p "Interface [enp0s3]: " IFACE; IFACE=${IFACE:-enp0s3}
+
+if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
+    read -p "Static IP: " IP; IP=${IP:-192.168.100.100}
+    read -p "Gateway: " GW; GW=${GW:-192.168.100.1}
+    cat <<EOF > "$NETWORK_CONFIG"
+{ ... }: {
+  networking = {
+    hostName = "$HOST";
+    firewall.allowedTCPPorts = [ 22 80 443 ]; # SSH + HTTP/S
+    useDHCP = false;
+    interfaces."$IFACE" = {
+      useDHCP = false;
+      ipv4.addresses = [{ address = "$IP"; prefixLength = 24; }];
+    };
+    defaultGateway = "$GW";
+    nameservers = [ "8.8.8.8" "1.1.1.1" ];
+  };
+}
+EOF
+else
+    cat <<EOF > "$NETWORK_CONFIG"
+{ ... }: {
+  networking = {
+    hostName = "$HOST";
+    firewall.allowedTCPPorts = [ 22 ];
+    networkmanager.enable = true;
+    interfaces."$IFACE".ipv4.addresses = [ ]; 
+  };
+}
+EOF
+fi
+
+# 3. Hardware Sync (copy only if missing)
+if [ ! -f "$HARDWARE_CONFIG" ]; then
+    echo "💾 Copying hardware config from /etc/nixos..."
+    cp /etc/nixos/hardware-configuration.nix "$HARDWARE_CONFIG"
+fi
+
+# 4. GIT STAGING (Make visible for Nix)
+# We force add them so Nix Flakes can see the content
+echo "📦 Adding local files to Git index for build..."
+git -C "$DOTFILES_DIR" add -f "$NETWORK_CONFIG" "$HARDWARE_CONFIG"
+
+# 5. REBUILD (Ship it!)
+echo "⚙️  Rebuilding system via Flake..."
+# Important: #nixos must match your configuration name in flake.nix
+if sudo nixos-rebuild switch --flake "$DOTFILES_DIR#nixos"; then
+    echo "✅ Success! System: $HOST"
+else
+    echo "❌ Build failed!"
+fi
+
+# 6. GIT CLEANUP (The "SRE Magic")
+# We remove them from index (make them "red" again) 
+# so they don't get accidentally committed to GitHub.
+echo "🛡️  Resetting index to keep local configs private..."
+git -C "$DOTFILES_DIR" reset "$NETWORK_CONFIG" "$HARDWARE_CONFIG" > /dev/null 2>&1
+
+# 7. Network Refresh
+echo "🔄 Restarting network-setup..."
+sudo systemctl restart network-setup.service
+
+echo "------------------------------------------"
+echo "🚀 Ship it! DONE."
+
