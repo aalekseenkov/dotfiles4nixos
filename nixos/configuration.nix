@@ -72,6 +72,13 @@
     config = {
       user.name = "${gitName}";
       user.email = "${gitEmail}";
+
+      # --- SSH SIGNING CONFIG ---
+      gpg.format = "ssh";
+      user.signingkey = "/home/${user}/.ssh/id_ed25519.pub";
+      commit.gpgsign = true;
+      gpg.ssh.allowedSignersFile = "/home/${user}/.ssh/allowed_signers";      
+
       safe.directory = [ "/home/${user}/.dotfiles" "*" ];
     };
   };
