@@ -1,10 +1,11 @@
-# NixOS Configuration (25.11 + Flakes)
-
-This repository contains a declarative configuration for a headless NixOS SRE/DevOps environment. It features a hybrid setup using **NixOS 25.11 (Stable)** with **Unstable** channels for critical tools like the Ansible Language Server.
+# NixOS Configuration 25.11
 
 ![dotfiles4nixos](./dotfiles4nixos.png)
 
-## 🚀 Quick Start
+## Description
+This repository contains a declarative configuration for a headless NixOS SRE/DevOps environment.
+
+## Quick Start
 
 If you are on a fresh NixOS install:
 1. Login as your user
@@ -12,7 +13,7 @@ If you are on a fresh NixOS install:
 3. Clone this repo: `git clone https://github.com/aalekseenkov/dotfiles4nixos.git ~/.dotfiles`
 4. Run the bootstrap: `cd ~/.dotfiles && ./ship --reconf`
 
-## 🛠 The `ship` Script
+## Installation
 
 The `ship` script is the heart of this setup. It automates the "dirty work" of staging local hardware configs and applying changes safely.
 
@@ -27,7 +28,7 @@ It also handles the lifecycle of your configuration:
 
 **Result:** Your local IP and Hardware UUIDs stay in the "Not staged for commit" (red) zone. They are never pushed to GitHub, keeping your private infrastructure data safe while maintaining a fully declarative build.
 
-## 👤 Customization (Identity)
+## Customization (Identity)
 
 To adapt this configuration, edit the variables in the `let` block of your **`flake.nix`**. This is the single source of truth:
 
@@ -40,13 +41,13 @@ let
 in
 ```
 
-## 🔐 Security & Signing
+## Security & Signing
 
 *   **SSH Signing:** This repo is configured to sign commits using your SSH key.
 *   **Verified Status:** Ensure your public SSH key is added to GitHub as a **Signing Key** (not just an Authentication key) to get the "Verified" badge.
 *   **Private Data:** `hardware-configuration.nix` and `local-networking.nix` are excluded from commits to keep your infrastructure private.
 
-## 💻 Tooling Stack
+## Tooling Stack
 
 *   **Editor:** Helix (`hx`) with specialized LSPs:
     *   `ansible-language-server` (Forced Unstable version)
