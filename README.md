@@ -1,9 +1,14 @@
-# NixOS Configuration 25.11
-
-![dotfiles4nixos](./dotfiles4nixos.png)
+# Bastion: Managed Environment (SRE + DevOps)
 
 ## Description
-This repository contains a declarative configuration for a headless NixOS SRE/DevOps environment.
+
+A fully declarative, reproducible, and secure gateway for infrastructure automation.
+
+Powered by **NixOS 25.11**, **Flakes**, and **Helix**.
+
+## The Engine Room: System Architecture
+
+![dotfiles4nixos](./dotfiles4nixos.png)
 
 ## Quick Start
 
