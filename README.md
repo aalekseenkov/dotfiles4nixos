@@ -13,20 +13,23 @@ If you are on a fresh NixOS install:
 3. Clone this repo: `git clone https://github.com/aalekseenkov/dotfiles4nixos.git ~/.dotfiles`
 4. Run the bootstrap: `cd ~/.dotfiles && ./ship --reconf`
 
-## Installation
+## 🚀 The `ship` Script: Deployment & Lifecycle
 
-The `ship` script is the heart of this setup. It automates the "dirty work" of staging local hardware configs and applying changes safely.
+The `ship` script is the orchestrator of the **Bastion 2.0** environment. It automates the "dirty work" of staging local hardware/network configurations and applying system changes safely through NixOS Flakes.
 
-*   `./ship` — **Daily Update**: Rebuilds the system using existing hardware and network configs.
-*   `./ship --reconf` — **Reconfigure**: Re-runs the interactive network setup (Static/DHCP, Hostname, Interface).
+#### Core Commands:
+*   **`./ship` — Daily Update**: The standard way to rebuild your system. It uses existing hardware and network configurations to apply updates to your software or dotfiles.
+*   **`./ship --reconf` — Reconfigure**: Forces a full reset of local settings. Use this to change your Hostname, Network Interface, or switch between Static and DHCP modes.
+*   **`./ship --dhcp` — Rapid DHCP**: A shortcut for non-static environments. It skips static IP prompts and configures the system to use **NetworkManager** and **DHCP** automatically. 
+    *   *SRE Tip: Use `./ship --reconf --dhcp` to instantly migrate from a static VM to a laptop/cloud environment.*
 
-It also handles the lifecycle of your configuration:
+#### The Git-Powered Configuration Lifecycle:
+To maintain a purely declarative build while keeping private infrastructure data (IPs, Gateway, Hardware UUIDs) out of public repositories, the script follows a specific lifecycle:
 
-1.  **Staging:** It runs `git add -f` on your local hardware and network configs. This makes them visible to **Nix Flakes** for the build.
-2.  **Building:** It executes `nixos-rebuild switch`.
-3.  **Cleanup:** Immediately after, it runs `git reset`. 
-
-**Result:** Your local IP and Hardware UUIDs stay in the "Not staged for commit" (red) zone. They are never pushed to GitHub, keeping your private infrastructure data safe while maintaining a fully declarative build.
+1.  **Staging**: It executes `git add -f` on `local-networking.nix` and `hardware-configuration.nix`. This "forces" Nix Flakes to see these files during the build process, even if they are gitignored.
+2.  **Building**: It runs `nixos-rebuild switch --flake .#nixos` to apply the new state.
+3.  **Cleanup**: Immediately after a successful (or failed) build attempt, it runs `git reset` on these files.
+4.  **Result**: Your private infrastructure details remain in the "Not staged for commit" (red) zone. You get a fully reproducible system without ever leaking your private network topology to GitHub.
 
 ## Customization (Identity)
 
