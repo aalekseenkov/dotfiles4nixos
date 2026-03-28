@@ -12,13 +12,13 @@
     device = "/dev/sda"; # Adjust if using NVMe (/dev/nvme0n1)
     useOSProber = true;
   };
-  
+
   time.timeZone = "Europe/Minsk";
   i18n.defaultLocale = "en_US.UTF-8";
 
   console = {
     font = "Lat2-Terminus16";
-    useXkbConfig = true; 
+    useXkbConfig = true;
   };
 
   services.xserver.xkb = {
@@ -55,10 +55,27 @@
   programs.nix-ld.enable = true;
 
   environment.systemPackages = with pkgs; [
-    git nodejs helix vim yazi starship dconf
-    ansible ansible-lint
-    yaml-language-server bash-language-server nil marksman
+    pkgs-unstable.helix
+    pkgs-unstable.zellij
+    pkgs-unstable.yazi
+    # pkgs-unstable.k9s
+    pkgs-unstable.bottom
+
+    # kubectl
+    # kubernetes-helm
+    # terraform
+    ansible
+    ansible-lint
+    sops
+    age
+    git
+    glab
+    nil
+    yaml-language-server
+    marksman
+    bash-language-server
     pkgs-unstable.ansible-language-server
+    starship
   ];
 
   environment.variables = {
@@ -77,7 +94,7 @@
       gpg.format = "ssh";
       user.signingkey = "/home/${user}/.ssh/id_ed25519.pub";
       commit.gpgsign = true;
-      gpg.ssh.allowedSignersFile = "/home/${user}/.ssh/allowed_signers";      
+      gpg.ssh.allowedSignersFile = "/home/${user}/.ssh/allowed_signers";
 
       safe.directory = [ "/home/${user}/.dotfiles" "*" ];
     };
@@ -93,18 +110,20 @@
   # --- SRE AUTOMATION (SYMLINKS & PERMS) ---
   system.activationScripts.postInstall = {
     text = ''
-      DOTS="/home/${user}/.dotfiles/configs"
-      CONF="/home/${user}/.config"
-      mkdir -p "$CONF/helix" "$CONF/starship" "$CONF/yazi"
+      USER_HOME="/home/${user}"
+      DOTS="$USER_HOME/.dotfiles/configs"
+      CONF="$USER_HOME/.config"
+
+      mkdir -p "$CONF/helix" "$CONF/starship" "$CONF/yazi" "$CONF/zellij/layouts"
+      mkdir -p "$USER_HOME/.cache/yaml-language-server"
 
       ln -sf "$DOTS/helix/config.toml" "$CONF/helix/config.toml"
       ln -sf "$DOTS/helix/languages.toml" "$CONF/helix/languages.toml"
       ln -sf "$DOTS/starship/starship.toml" "$CONF/starship/starship.toml"
       ln -sf "$DOTS/yazi/yazi.toml" "$CONF/yazi/yazi.toml"
+      # ln -sf "$DOTS/zellij/sre.kdl" "$CONF/zellij/layouts/sre.kdl"
 
-      # Ensure permissions for cache and config
-      mkdir -p /home/${user}/.cache/yaml-language-server
-      chown -R ${user}:users /home/${user}
+      chown -R ${user}:users "$CONF/helix" "$CONF/starship" "$CONF/yazi" "$CONF/zellij" "$USER_HOME/.cache"
     '';
     deps = [ "users" ];
   };

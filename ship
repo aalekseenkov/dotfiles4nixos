@@ -6,20 +6,44 @@ DOTFILES_DIR="/home/$REAL_USER/.dotfiles"
 NETWORK_CONFIG="$DOTFILES_DIR/nixos/local-networking.nix"
 HARDWARE_CONFIG="$DOTFILES_DIR/nixos/hardware-configuration.nix"
 
-# 2. Network config generation
-echo "🌐 Network Setup:"
-read -p "Use STATIC IP? (y/n) [y]: " USE_STATIC; USE_STATIC=${USE_STATIC:-y}
-read -p "Hostname [nixos]: " HOST; HOST=${HOST:-nixos}
-read -p "Interface [enp0s3]: " IFACE; IFACE=${IFACE:-enp0s3}
+# --- ARGUMENTS PARSING ---
+RECONF=false
+LAPTOP_PRESET=false
 
-if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
-    read -p "Static IP: " IP; IP=${IP:-192.168.100.100}
-    read -p "Gateway: " GW; GW=${GW:-192.168.100.1}
-    cat <<EOF > "$NETWORK_CONFIG"
+for arg in "$@"; do
+    case $arg in
+        --reconf) RECONF=true ;;
+        --dhcp) DHCP_MODE=true ;;
+    esac
+done
+
+if [ "$RECONF" = true ]; then
+    echo "🔄 RECONF MODE: Cleaning local configs for a fresh start..."
+    rm -f "$NETWORK_CONFIG" "$HARDWARE_CONFIG"
+fi
+
+# 2. Network config generation
+if [ ! -f "$NETWORK_CONFIG" ]; then
+    echo "🌐 Network Setup:"
+
+    if [ "$DHCP_MODE" = true ]; then
+        USE_STATIC="n"
+        echo "💻 Laptop preset detected: skipping static IP questions."
+    else
+        read -p "Use STATIC IP? (y/n) [y]: " USE_STATIC; USE_STATIC=${USE_STATIC:-y}
+    fi
+
+    read -p "Hostname [nixos]: " HOST; HOST=${HOST:-nixos}
+    read -p "Interface [enp0s3]: " IFACE; IFACE=${IFACE:-enp0s3}
+
+    if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
+        read -p "Static IP: " IP; IP=${IP:-192.168.100.100}
+        read -p "Gateway: " GW; GW=${GW:-192.168.100.1}
+        cat <<EOF > "$NETWORK_CONFIG"
 { ... }: {
   networking = {
     hostName = "$HOST";
-    firewall.allowedTCPPorts = [ 22 80 443 ]; # SSH + HTTP/S
+    firewall.allowedTCPPorts = [ 22 80 443 ];
     useDHCP = false;
     interfaces."$IFACE" = {
       useDHCP = false;
@@ -30,17 +54,20 @@ if [[ "$USE_STATIC" =~ ^[Yy]$ ]]; then
   };
 }
 EOF
-else
-    cat <<EOF > "$NETWORK_CONFIG"
+    else
+        cat <<EOF > "$NETWORK_CONFIG"
 { ... }: {
   networking = {
     hostName = "$HOST";
     firewall.allowedTCPPorts = [ 22 ];
     networkmanager.enable = true;
-    interfaces."$IFACE".ipv4.addresses = [ ]; 
   };
 }
 EOF
+    fi
+else
+    echo "✅ Network config exists. Use --reconf to change it."
+    HOST=$(grep "hostName =" "$NETWORK_CONFIG" | cut -d'"' -f2)
 fi
 
 # 3. Hardware Sync (copy only if missing)
@@ -50,29 +77,30 @@ if [ ! -f "$HARDWARE_CONFIG" ]; then
 fi
 
 # 4. GIT STAGING (Make visible for Nix)
-# We force add them so Nix Flakes can see the content
 echo "📦 Adding local files to Git index for build..."
 git -C "$DOTFILES_DIR" add -f "$NETWORK_CONFIG" "$HARDWARE_CONFIG"
 
 # 5. REBUILD (Ship it!)
 echo "⚙️  Rebuilding system via Flake..."
-# Important: #nixos must match your configuration name in flake.nix
 if sudo nixos-rebuild switch --flake "$DOTFILES_DIR#nixos"; then
-    echo "✅ Success! System: $HOST"
+    echo "✅ Success! System: ${HOST:-nixos}"
 else
     echo "❌ Build failed!"
+    # Не делаем reset, чтобы можно было отдебажить файлы, если билд упал
+    exit 1
 fi
 
 # 6. GIT CLEANUP (The "SRE Magic")
-# We remove them from index (make them "red" again) 
-# so they don't get accidentally committed to GitHub.
 echo "🛡️  Resetting index to keep local configs private..."
 git -C "$DOTFILES_DIR" reset "$NETWORK_CONFIG" "$HARDWARE_CONFIG" > /dev/null 2>&1
 
-# 7. Network Refresh
-echo "🔄 Restarting network-setup..."
-sudo systemctl restart network-setup.service
+# 7. Network Refresh (Safe for NetworkManager)
+echo "🔄 Refreshing network..."
+if systemctl is-active --quiet NetworkManager; then
+    sudo systemctl restart NetworkManager
+else
+    sudo systemctl restart network-setup.service 2>/dev/null || true
+fi
 
 echo "------------------------------------------"
 echo "🚀 Ship it! DONE."
-

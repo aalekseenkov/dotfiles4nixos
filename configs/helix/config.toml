@@ -5,25 +5,27 @@ line-number = "relative"
 cursorline = true
 color-modes = true
 bufferline = "multiple"
-auto-format = true
 idle-timeout = 0
 true-color = true
-# Added "spacer" at the end to prevent text sticking to numbers
+rulers = [80, 100]
+default-yank-register = '+'
+
+trim-trailing-whitespace = true
+auto-format = true
+
+whitespace.render = "all"
+whitespace.characters.space = "."
+whitespace.characters.tab = ">"
+whitespace.characters.newline = "$"
+# whitespace.characters.trailing = "#"
+
 gutters = ["diff", "diagnostics", "line-numbers", "spacer"]
 
 [editor.cursor-shape]
+# Здесь секция допустима
 insert = "bar"
 normal = "block"
 select = "underline"
-
-[editor.whitespace]
-render = "all"
-
-[editor.whitespace.characters]
-space = " "
-newline = " "
-tab = "→"      # Only TAB is visible
-trailing = "·" # Only trailing spaces are visible
 
 [editor.statusline]
 # Added "spacer" and "spinner" for a professional look
