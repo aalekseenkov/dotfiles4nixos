@@ -1,4 +1,4 @@
-theme = "default"
+theme = "acme"
 
 [editor]
 line-number = "relative"
@@ -9,26 +9,37 @@ idle-timeout = 0
 true-color = true
 rulers = [80, 100]
 default-yank-register = '+'
-
-trim-trailing-whitespace = true
 auto-format = true
+trim-trailing-whitespace = true
 
-whitespace.render = "all"
-whitespace.characters.space = "."
-whitespace.characters.tab = ">"
-whitespace.characters.newline = "$"
-# whitespace.characters.trailing = "#"
+[editor.indent-guides]
+render = true
 
-gutters = ["diff", "diagnostics", "line-numbers", "spacer"]
+[editor.whitespace]
+render = "all"
+
+# or control each character
+[editor.whitespace.render]
+space = "all"
+tab = "all"
+nbsp = "none"
+nnbsp = "none"
+newline = "none"
+
+[editor.whitespace.characters]
+space = "·"
+nbsp = "⍽"
+nnbsp = "␣"
+tab = "→"
+newline = "⏎"
+tabpad = "·" # Tabs will look like "→···" (depending on tab width)
 
 [editor.cursor-shape]
-# Здесь секция допустима
 insert = "bar"
 normal = "block"
 select = "underline"
 
 [editor.statusline]
-# Added "spacer" and "spinner" for a professional look
 left = ["mode", "spacer", "spinner", "spacer", "file-name", "spacer", "file-modification-indicator"]
 right = ["diagnostics", "selections", "position", "file-encoding", "file-type"]
 separator = "│"
