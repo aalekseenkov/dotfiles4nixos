@@ -1,4 +1,4 @@
-# Bastion: Managed Environment (SRE + DevOps)
+# Bastion v2.0: Managed SRE Environment
 
 ## Description
 
