@@ -8,7 +8,7 @@ HARDWARE_CONFIG="$DOTFILES_DIR/nixos/hardware-configuration.nix"
 
 # --- ARGUMENTS PARSING ---
 RECONF=false
-LAPTOP_PRESET=false
+DHCP_MODE=false
 
 for arg in "$@"; do
     case $arg in
@@ -28,7 +28,7 @@ if [ ! -f "$NETWORK_CONFIG" ]; then
 
     if [ "$DHCP_MODE" = true ]; then
         USE_STATIC="n"
-        echo "💻 Laptop preset detected: skipping static IP questions."
+        echo "🌐 DHCP mode selected: skipping static IP questions."
     else
         read -p "Use STATIC IP? (y/n) [y]: " USE_STATIC; USE_STATIC=${USE_STATIC:-y}
     fi
@@ -44,6 +44,7 @@ if [ ! -f "$NETWORK_CONFIG" ]; then
   networking = {
     hostName = "$HOST";
     firewall.allowedTCPPorts = [ 22 80 443 ];
+    networkmanager.enable = false;
     useDHCP = false;
     interfaces."$IFACE" = {
       useDHCP = false;
@@ -59,7 +60,7 @@ EOF
 { ... }: {
   networking = {
     hostName = "$HOST";
-    firewall.allowedTCPPorts = [ 22 ];
+    firewall.allowedTCPPorts = [ 22 80 443 ];
     networkmanager.enable = true;
   };
 }
@@ -82,11 +83,19 @@ git -C "$DOTFILES_DIR" add -f "$NETWORK_CONFIG" "$HARDWARE_CONFIG"
 
 # 5. REBUILD (Ship it!)
 echo "⚙️  Rebuilding system via Flake..."
-if sudo nixos-rebuild switch --flake "$DOTFILES_DIR#nixos"; then
-    echo "✅ Success! System: ${HOST:-nixos}"
+
+# SRE-logic: If reconfiguring network, use 'boot' to avoid SSH deadlock.
+# Otherwise, use 'switch' for instant updates.
+ACTION="switch"
+if [ "$RECONF" = true ] || [ "$DHCP_MODE" = true ]; then
+    ACTION="boot"
+    echo "🛡️  Network change detected: preparing for BOOT (no-switch mode)."
+fi
+
+if sudo nixos-rebuild $ACTION --flake "$DOTFILES_DIR#nixos"; then
+    echo "✅ Success! Configuration prepared ($ACTION)."
 else
     echo "❌ Build failed!"
-    # Не делаем reset, чтобы можно было отдебажить файлы, если билд упал
     exit 1
 fi
 
@@ -94,12 +103,28 @@ fi
 echo "🛡️  Resetting index to keep local configs private..."
 git -C "$DOTFILES_DIR" reset "$NETWORK_CONFIG" "$HARDWARE_CONFIG" > /dev/null 2>&1
 
-# 7. Network Refresh (Safe for NetworkManager)
-echo "🔄 Refreshing network..."
-if systemctl is-active --quiet NetworkManager; then
-    sudo systemctl restart NetworkManager
+# 7. Network Refresh & Post-Deployment Logic
+echo "🔄 Finalizing deployment..."
+
+if [ "$RECONF" = true ] || [ "$DHCP_MODE" = true ]; then
+    echo "⚠️  NETWORK RECONFIGURATION DETECTED!"
+    echo "Applying new network settings will likely DROP your current SSH session."
+    read -p "🚀 Do you want to REBOOT now to apply changes safely? (y/n) [y]: " DO_REBOOT
+    DO_REBOOT=${DO_REBOOT:-y}
+
+    if [[ "$DO_REBOOT" =~ ^[Yy]$ ]]; then
+        echo "♻️  Saving state and rebooting in 3 seconds..."
+        sleep 3
+        sudo reboot
+    else
+        echo "🛡️  Skipping reboot. Attempting soft refresh (risky for SSH)..."
+        sudo systemctl restart network-setup.service 2>/dev/null || true
+        sudo systemctl restart sshd
+    fi
 else
-    sudo systemctl restart network-setup.service 2>/dev/null || true
+    echo "✅ No network changes detected. Soft refreshing services..."
+    sudo systemctl restart sshd
+    echo "🏰 Bastion v2.0: Daily update complete."
 fi
 
 echo "------------------------------------------"
