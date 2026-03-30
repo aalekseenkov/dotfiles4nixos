@@ -66,6 +66,11 @@ in
 
 *The list is updated as it develops.*
 
+## Additional actions (optional)
+
+*  Adding ssh-keys for Github/Gitlab
+*  ssh-keys to work remotely from Wezterm
+
 ## Useful Links
 [Installing NixOS in a VirtualBox guest](https://nixos.org/manual/nixos/stable/#sec-installing-virtualbox-guest)
 
