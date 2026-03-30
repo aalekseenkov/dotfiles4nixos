@@ -12,7 +12,7 @@ Powered by **NixOS 25.11**, **Flakes**, and **Helix**.
 
 1. Install **NixOS 25.11** (No Desktop)
 2. Login as your user
-3. `nix-shell -p git
+3. `nix-shell -p git`
 4. `git clone https://github.com/aalekseenkov/dotfiles4nixos.git ~/.dotfiles`
 5. `cd ~/.dotfiles`
 6. `./ship --reconf`
