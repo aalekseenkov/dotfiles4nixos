@@ -8,7 +8,7 @@ Powered by **NixOS 25.11**, **Flakes**, and **Helix**.
 
 ![dotfiles4nixos](./dotfiles4nixos.png)
 
-## Quick Start
+## Initial Setup
 
 1. Install **NixOS 25.11** (No Desktop)
 2. Login as your user
@@ -68,8 +68,29 @@ in
 
 ## Additional actions (optional)
 
-*  Adding ssh-keys for Github/Gitlab
-*  ssh-keys to work remotely from Wezterm
+### Deploy SSH Keys (Windows -> Bastion -> Remotes)
+
+```
+# Bastion (NixOS)
+# Initialize Environment
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+
+# Windows Host (Powershell)
+# Inbound access (Windows to Bastion)
+scp $HOME\.ssh\id_ed25519_windows.pub your_user@IP:~/.ssh/authorized_keys
+# Outbound identities (Bastion to Remotes)
+scp $HOME\.ssh\id_ed25519_git your_user@IP:~/.ssh/id_ed25519_git
+scp $HOME\.ssh\id_ed25519_git.pub your_user@IP:~/.ssh/id_ed25519_git.pub
+
+# Bastion (NixOS)
+# Permission Hardening
+chmod 600 ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/id_ed25519_git
+chmod 644 ~/.ssh/id_ed25519_git.pub
+
+# Generate Local Identity (Alternative)
+ssh-keygen -t ed25519 -C "bastion-v2"
+```
 
 ## Useful Links
 [Installing NixOS in a VirtualBox guest](https://nixos.org/manual/nixos/stable/#sec-installing-virtualbox-guest)
