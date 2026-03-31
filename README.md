@@ -88,6 +88,9 @@ chmod 600 ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/id_ed25519_git
 chmod 644 ~/.ssh/id_ed25519_git.pub
 
+# SSH Keys Quick Testing
+ssh -T git@github.com
+
 # Generate Local Identity (Alternative)
 ssh-keygen -t ed25519 -C "bastion-v2"
 ```
