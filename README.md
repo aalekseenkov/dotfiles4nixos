@@ -90,7 +90,11 @@ chmod 644 ~/.ssh/id_ed25519_git.pub
 
 # SSH Keys Quick Testing
 ssh -T git@github.com
+```
 
+### Operational Tips & Tricks
+
+```
 # Generate Local Identity (Alternative)
 ssh-keygen -t ed25519 -C "bastion-v2"
 ```
