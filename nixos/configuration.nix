@@ -104,6 +104,9 @@
     enable = true;
     autosuggestions.enable = true;
     syntaxHighlighting.enable = true;
+    shellInit = ''
+      zsh-newuser-install() { : }
+    '';
     promptInit = ''eval "$(${pkgs.starship}/bin/starship init zsh)"'';
   };
 
