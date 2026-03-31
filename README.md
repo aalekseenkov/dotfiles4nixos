@@ -97,6 +97,10 @@ ssh -T git@github.com
 ```
 # Generate Local Identity (Alternative)
 ssh-keygen -t ed25519 -C "bastion-v2"
+
+# Switching remote URLs from HTTPS to SSH
+git remote set-url origin git@github.com:OWNER/REPOSITORY.git
+git remote -v
 ```
 
 ## Useful Links
