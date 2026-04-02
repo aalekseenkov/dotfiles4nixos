@@ -104,9 +104,12 @@
     enable = true;
     autosuggestions.enable = true;
     syntaxHighlighting.enable = true;
+
     shellInit = ''
+      export KEYTIMEOUT=1
       zsh-newuser-install() { : }
     '';
+
     promptInit = ''eval "$(${pkgs.starship}/bin/starship init zsh)"'';
   };
 
@@ -124,7 +127,8 @@
       ln -sf "$DOTS/helix/languages.toml" "$CONF/helix/languages.toml"
       ln -sf "$DOTS/starship/starship.toml" "$CONF/starship/starship.toml"
       ln -sf "$DOTS/yazi/yazi.toml" "$CONF/yazi/yazi.toml"
-      # ln -sf "$DOTS/zellij/sre.kdl" "$CONF/zellij/layouts/sre.kdl"
+      ln -sf "$DOTS/zellij/config.kdl" "$CONF/zellij/config.kdl"
+      ln -sf "$DOTS/zellij/sre.kdl" "$CONF/zellij/layouts/sre.kdl"
 
       chown -R ${user}:users "$CONF/helix" "$CONF/starship" "$CONF/yazi" "$CONF/zellij" "$USER_HOME/.cache"
     '';

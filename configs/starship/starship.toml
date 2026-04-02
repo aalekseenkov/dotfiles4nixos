@@ -1,8 +1,14 @@
 # Get editor-friendly prompts
 format = """
-[┌───────────────────](bold green)
-[│](bold green) $directory$git_branch$git_status
-[└─](bold green) $character"""
+[┌─](green)$env_var[──────────────────](green)
+[│ ](green) $directory$git_branch$git_status
+[└─](green) $character"""
+
+[env_var.ZELLIJ]
+variable = "ZELLIJ"
+format = "[ $symbol ]($style)"
+symbol = "zellij"
+style = "green"
 
 # Disable modules that cause "Permission denied" or slowness
 [package]
@@ -15,19 +21,24 @@ disabled = true
 disabled = true
 
 [directory]
-style = "bold cyan"
+style = "cyan"
 truncate_to_repo = true
 truncation_symbol = "…/"
 
 [git_branch]
 symbol = "🌱 "
-style = "bold green"
+style = "green"
 
 [git_status]
 style = "bold red"
 format = "([\\[$all_status$ahead_behind\\]]($style) )"
 
 [character]
-success_symbol = "[λ](bold green)"
-error_symbol = "[λ](bold red)"
+success_symbol = "[〉](green)"
+error_symbol = "[〉](red)"
+
+vimcmd_symbol = "[〈](yellow)"
+vimcmd_replace_one_symbol = "[〈](purple)"
+vimcmd_replace_symbol = "[〈](purple)"
+vimcmd_visual_symbol = "[〈](lavender)"
 
