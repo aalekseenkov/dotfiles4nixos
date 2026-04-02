@@ -1,4 +1,4 @@
-# BastiOn 2 (Managed SRE Environment)
+# Bastion 2 (Managed SRE Environment)
 
 > A fully declarative, reproducible, and secure gateway for infrastructure automation.
 
@@ -19,7 +19,7 @@ Powered by **NixOS 25.11**, **Flakes**, and **Helix**.
 
 ## Ship It Smart and Fast
 
-The `ship` script is the orchestrator of the **BastiOn 2** environment. It automates the "dirty work" of staging local hardware/network configurations and applying system changes safely through NixOS Flakes.
+The `ship` script is the orchestrator of the **Bastion 2** environment. It automates the "dirty work" of staging local hardware/network configurations and applying system changes safely through NixOS Flakes.
 
 ### Core Commands:
 * `./ship` - **daily update**. The standard way to rebuild your system. It uses existing hardware and network configurations to apply updates to your software or dotfiles.
@@ -66,9 +66,9 @@ in
 
 *The list is updated as it develops.*
 
-## Additional actions (optional)
+## Deploy SSH Keys
 
-### Deploy SSH Keys (Windows -> Bastion -> Remotes)
+### 1. Windows Host -> NixOS Bastion -> Remotes
 
 ```
 # Bastion (NixOS)
@@ -91,14 +91,65 @@ chmod 644 ~/.ssh/id_ed25519_git.pub
 # SSH Keys Quick Testing
 ssh -T git@github.com
 ```
+## GitLab CLI Setup and Usage
 
-### Operational Tips & Tricks
+### 1. Authentication Token
+
+To manage pipelines and repositories from the terminal, we need a Personal Access Token (PAT):
+- **Required scopes:** api, read_api, write_repository, read_repositore
+- **Role:** Developer (or higher)
+
+### 2. Connection Command
+
+Run the interactive login and follow the prompts:
 
 ```
-# Generate Local Identity (Alternative)
-ssh-keygen -t ed25519 -C "bastion-v2"
+glab auth login
+```
 
-# Switching remote URLs from HTTPS to SSH
+- **Instance:** gitlab.com
+- **Method:** Token
+- **Protocol:** SSH
+- **API Protocol:** HTTPS
+
+### 3. Pipeline Monitoring
+
+- `glab pipeline ci view` - interactive TUI to watch pipeline stages and logs
+- `glab pipeline ci status` - quick summary of the last pipeline status
+- `glab ci trace` - stream logs of a running job (interactive selection)
+- `glab pipeline list` - list recent pipelines for the current branch
+
+### 4. Job Management
+
+- `glab ci retry` - rerun the last failed job
+- `glab pipeline create` - manually trigger a new pipeline on the current branch
+- `glab ci run` - run a specific job manually (if defined as manual in YAML)
+
+### 5. Repository & MRs
+
+- `glab repo view` - display project description and stats
+- `glab mr list` - list open Merge Requests in the current project
+- `glab mr checkout <id>` - quickly switch to the branch of a specific MR
+
+### 6. Pipeline View Interactivity
+
+| Key | Action |
+| :--- | :--- |
+| `Enter` | View logs for the selected job |
+| `R` | Retry the selected job |
+| `C` | Cancel the selected job (if running) |
+| `Q` | Exit the view |
+
+## Miscellaneous
+
+### 1. Generate Local Identity (Alternative)
+
+```
+ssh-keygen -t ed25519 -C "bastion-v2"
+```
+
+### 2. Switching remote URLs from HTTPS to SSH
+```
 git remote set-url origin git@github.com:OWNER/REPOSITORY.git
 git remote -v
 ```
