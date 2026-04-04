@@ -1,40 +1,83 @@
-[language-server.ansible-ls]
-command = "ansible-language-server"
-args = ["--stdio"]
-# Passing path to ansible-lint for local schema validation without internet
-config = { ansible = { lint = { enabled = true, path = "ansible-lint" } } }
-
+########
+# YAML #
+########
 [language-server.yaml-language-server]
 command = "yaml-language-server"
 args = ["--stdio"]
 config = { yaml = { format = { enable = true }, validate = true, schemas = { "kubernetes" = "*.yaml" } } }
-
-[language-server.nil]
-command = "nil"
-
-[language-server.bash-ls]
-command = "bash-language-server"
-args = ["start"]
-
-[[language]]
-name = "ansible"
-scope = "source.ansible"
-file-types = ["yml", "yaml"]
-roots = ["ansible.cfg", ".ansible-lint", "roles", "inventory"]
-auto-format = true
-# Use specialized ansible-ls instead of generic yaml-ls
-language-servers = [ { name = "ansible-ls" } ]
 
 [[language]]
 name = "yaml"
 scope = "source.yaml"
 file-types = ["yml", "yaml", "json"]
 auto-format = true
-language-servers = [ { name = "yaml-language-server" } ]
+language-servers = [{ name = "yaml-language-server" }]
+
+###########
+# ANSIBLE #
+###########
+[language-server.ansible-ls]
+command = "ansible-language-server"
+args = ["--stdio"]
+
+[language-server.ansible-ls.config.ansible]
+ansible.path = "ansible"
+python.interpreterPath = "python3"
+lint.enabled = false
+
+[[language]]
+name = "ansible"
+scope = "source.ansible"
+file-types = ["yml", "yaml"]
+roots = [
+  "ansible.cfg",
+  ".ansible-lint",
+  "roles",
+  "inventory",
+  "group_vars",
+  "host_vars",
+  "playbook.yml",
+]
+auto-format = true
+language-servers = [{ name = "ansible-ls" }]
+
+########
+# BASH #
+########
+[language-server.bash-ls]
+command = "bash-language-server"
+args = ["start"]
 
 [[language]]
 name = "bash"
 scope = "source.bash"
 file-types = ["sh", "bash"]
 auto-format = true
-language-servers = [ { name = "bash-ls" } ]
+language-servers = [{ name = "bash-ls" }]
+
+########
+# TOML #
+########
+[language-server.taplo]
+command = "taplo"
+args = ["lsp", "stdio"]
+
+[[language]]
+name = "toml"
+scope = "source.toml"
+file-types = ["toml"]
+auto-format = true
+language-servers = [{ name = "taplo" }]
+
+#######
+# NIX #
+#######
+[language-server.nil]
+command = "nil"
+
+[[language]]
+name = "nix"
+scope = "source.nix"
+file-types = ["nix"]
+auto-format = true
+language-servers = [{ name = "nil" }]

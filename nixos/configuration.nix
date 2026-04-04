@@ -58,8 +58,9 @@
     pkgs-unstable.helix
     pkgs-unstable.zellij
     pkgs-unstable.yazi
-    # pkgs-unstable.k9s
+    pkgs-unstable.ansible-language-server
     pkgs-unstable.bottom
+    # pkgs-unstable.k9s
 
     # kubectl
     # kubernetes-helm
@@ -74,14 +75,15 @@
     yaml-language-server
     marksman
     bash-language-server
-    pkgs-unstable.ansible-language-server
     starship
+    taplo
   ];
 
   environment.variables = {
     EDITOR = "hx";
     VISUAL = "hx";
     STARSHIP_CONFIG = "/home/${user}/.dotfiles/configs/starship/starship.toml";
+    ANSIBLE_HOME = "/home/${user}/.ansible";
   };
 
   programs.git = {
@@ -113,15 +115,27 @@
     promptInit = ''eval "$(${pkgs.starship}/bin/starship init zsh)"'';
   };
 
-  # --- SRE AUTOMATION (SYMLINKS & PERMS) ---
+  # --- AUTOMATION (SYMLINKS & PERMISSIONS) ---
   system.activationScripts.postInstall = {
     text = ''
       USER_HOME="/home/${user}"
       DOTS="$USER_HOME/.dotfiles/configs"
       CONF="$USER_HOME/.config"
 
-      mkdir -p "$CONF/helix" "$CONF/starship" "$CONF/yazi" "$CONF/zellij/layouts"
+      CONFIG_DIRS=(
+        "helix"
+        "starship"
+        "yazi"
+        "zellij/layouts"
+        "glab-cli"
+      )
+
+      for dir in "''${CONFIG_DIRS[@]}"; do
+        mkdir -p "$CONF/$dir"
+      done
+
       mkdir -p "$USER_HOME/.cache/yaml-language-server"
+      mkdir -p "$USER_HOME/.ansible/tmp"
 
       ln -sf "$DOTS/helix/config.toml" "$CONF/helix/config.toml"
       ln -sf "$DOTS/helix/languages.toml" "$CONF/helix/languages.toml"
@@ -130,7 +144,9 @@
       ln -sf "$DOTS/zellij/config.kdl" "$CONF/zellij/config.kdl"
       ln -sf "$DOTS/zellij/sre.kdl" "$CONF/zellij/layouts/sre.kdl"
 
-      chown -R ${user}:users "$CONF/helix" "$CONF/starship" "$CONF/yazi" "$CONF/zellij" "$USER_HOME/.cache"
+      chown -R ${user}:users "$CONF"
+      chown -R ${user}:users "$USER_HOME/.cache"
+      chown -R ${user}:users "$USER_HOME/.ansible"
     '';
     deps = [ "users" ];
   };
