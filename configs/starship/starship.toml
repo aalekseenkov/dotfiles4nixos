@@ -1,8 +1,18 @@
 # Get editor-friendly prompts
 format = """
-[┌─](green)$env_var[──────────────────](green)
+[┌─](green)$env_var$fill$time[── ](green)
 [│ ](green) $directory$git_branch$git_status
 [└─](green) $character"""
+
+[fill]
+symbol = "─"
+style = "green"
+
+[time]
+disabled = false
+format = "[ $time ]($style)"
+time_format = "%H:%M"
+style = "green"
 
 [env_var.ZELLIJ]
 variable = "ZELLIJ"
@@ -41,4 +51,3 @@ vimcmd_symbol = "[〈](yellow)"
 vimcmd_replace_one_symbol = "[〈](purple)"
 vimcmd_replace_symbol = "[〈](purple)"
 vimcmd_visual_symbol = "[〈](lavender)"
-
