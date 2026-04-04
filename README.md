@@ -90,7 +90,25 @@ chmod 644 ~/.ssh/id_ed25519_git.pub
 
 # SSH Keys Quick Testing
 ssh -T git@github.com
+
+# The six steps to config SSH on Windows Host
+# Powershell Administration
+# 1. Navigate to the SSH directory
+cd $env:USERPROFILE\.ssh
+# 2. Open SSH config
+notepad config
+# 3. Add and update your host into config file
+Host bastion
+    HostName 192.168.100.100
+    User ava
+# 4. Remove inherited permissions (isolate the file)
+icacls config /inheritance:r
+# 5. Grant Full Control only to the current user
+icacls config /grant:r "${env:USERNAME}:F"
+# 6. Grant Full Control to the SYSTEM account
+icacls config /grant:r SYSTEM:F
 ```
+
 ## GitLab CLI Setup and Usage
 
 ### 1. Authentication Token
