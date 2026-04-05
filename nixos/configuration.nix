@@ -1,4 +1,13 @@
-{ config, pkgs, pkgs-unstable, lib, user, gitName, gitEmail, ... }:
+{
+  config,
+  pkgs,
+  pkgs-unstable,
+  lib,
+  user,
+  gitName,
+  gitEmail,
+  ...
+}:
 
 {
   imports = [
@@ -27,7 +36,11 @@
   };
 
   # --- VIRTUALIZATION & HARDWARE ---
-  fonts.packages = [ pkgs.nerd-fonts.jetbrains-mono ];
+  fonts.packages = [
+    pkgs.nerd-fonts.intone-mono
+    pkgs.nerd-fonts.iosevka
+    pkgs.nerd-fonts.jetbrains-mono
+  ];
   virtualisation.virtualbox.guest.enable = true;
   virtualisation.docker.enable = true;
   zramSwap.enable = true;
@@ -41,12 +54,19 @@
   };
 
   # --- USERS ---
-  nix.settings.trusted-users = [ "root" "${user}" ];
+  nix.settings.trusted-users = [
+    "root"
+    "${user}"
+  ];
   users.users.${user} = {
     isNormalUser = true;
     description = "${gitName}";
     home = "/home/${user}";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "docker"
+    ];
     shell = pkgs.zsh;
   };
 
@@ -61,7 +81,6 @@
     pkgs-unstable.ansible-language-server
     pkgs-unstable.bottom
     # pkgs-unstable.k9s
-
     # kubectl
     # kubernetes-helm
     # terraform
@@ -98,7 +117,10 @@
       commit.gpgsign = true;
       gpg.ssh.allowedSignersFile = "/home/${user}/.ssh/allowed_signers";
 
-      safe.directory = [ "/home/${user}/.dotfiles" "*" ];
+      safe.directory = [
+        "/home/${user}/.dotfiles"
+        "*"
+      ];
     };
   };
 
@@ -114,6 +136,17 @@
 
     promptInit = ''eval "$(${pkgs.starship}/bin/starship init zsh)"'';
   };
+
+  # environment.interactiveShellInit = ''
+  #   hx() {
+  #     # 1. Set the Helix Background
+  #     echo -ne "\033]11;#3B224C\007"
+  #     # 2. Launch Helix
+  #     command hx "$@"
+  #     # 3. Return Terminal Background
+  #     echo -ne "\033]11;#008080\007"
+  #   }
+  # '';
 
   # --- AUTOMATION (SYMLINKS & PERMISSIONS) ---
   system.activationScripts.postInstall = {
@@ -151,7 +184,9 @@
     deps = [ "users" ];
   };
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
   system.stateVersion = "25.11";
 }
-
