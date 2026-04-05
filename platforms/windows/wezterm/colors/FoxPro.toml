@@ -1,9 +1,9 @@
 [colors]
-background    = "#008080"
+background    = "#00AAAA"
 foreground    = "#FFFFFF"
 cursor_bg     = "#FFFFFF"
-cursor_fg     = "#008080"
-selection_bg  = "#AAAAAA"
-selection_fg  = "#000000"
-ansi = ["#000000", "#AA0000", "#00AA00", "#AA5500", "#0000AA", "#AA00AA", "#00AAAA", "#AAAAAA"]
-brights = ["#555555", "#FF5555", "#55FF55", "#FFFF55", "#5555FF", "#FF55FF", "#55FFFF", "#FFFFFF"]
+cursor_fg     = "#00AAAA"
+selection_bg  = "#FFFFFF"
+selection_fg  = "#00AAAA"
+ansi = ["#00AAAA", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"]
+brights = ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"]
