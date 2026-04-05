@@ -1,38 +1,9 @@
--- WezTerm configuration for SRE Bastion v2.0
--- Theme: FoxPro 2.6 Legacy (1993 Engineering Edition)
-
-config.colors = {
-  -- Primary interface colors
-  background    = "#008080", -- Classic FoxPro Teal (Dark Cyan)
-  foreground    = "#FFFFFF", -- High Intensity White (DOS Default)
-
-  -- Cursor and selection (Classic TUI style)
-  cursor_bg     = "#FFFFFF",
-  cursor_fg     = "#008080",
-  selection_bg  = "#AAAAAA", -- Gray background for selection
-  selection_fg  = "#000000", -- Black text for contrast when selected
-
-  -- Standard ANSI colors (EGA Palette 0-7)
-  ansi = {
-    "#000000", -- Black
-    "#AA0000", -- Red (Critical errors)
-    "#00AA00", -- Green (Success status)
-    "#AA5500", -- Brown (Warnings)
-    "#0000AA", -- Blue
-    "#AA00AA", -- Magenta
-    "#00AAAA", -- Cyan
-    "#AAAAAA", -- Light Gray (Inactive text)
-  },
-
-  -- Bright ANSI colors (EGA Palette 8-15)
-  brights = {
-    "#555555", -- Dark Gray
-    "#FF5555", -- Bright Red (Fatal errors)
-    "#55FF55", -- Bright Green (Active tasks)
-    "#FFFF55", -- Bright Yellow (Attention/Hints)
-    "#5555FF", -- Bright Blue
-    "#FF55FF", -- Bright Magenta
-    "#55FFFF", -- Bright Cyan
-    "#FFFFFF", -- Bright White
-  }
-}
+[colors]
+background    = "#008080"
+foreground    = "#FFFFFF"
+cursor_bg     = "#FFFFFF"
+cursor_fg     = "#008080"
+selection_bg  = "#AAAAAA"
+selection_fg  = "#000000"
+ansi = ["#000000", "#AA0000", "#00AA00", "#AA5500", "#0000AA", "#AA00AA", "#00AAAA", "#AAAAAA"]
+brights = ["#555555", "#FF5555", "#55FF55", "#FFFF55", "#5555FF", "#FF55FF", "#55FFFF", "#FFFFFF"]
