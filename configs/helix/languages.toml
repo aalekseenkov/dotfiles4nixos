@@ -81,3 +81,33 @@ scope = "source.nix"
 file-types = ["nix"]
 auto-format = true
 language-servers = [{ name = "nil" }]
+
+######
+# GO #
+######
+[language-server.gopls]
+command = "gopls"
+config = { "ui.inlayhint.hints" = { "assignVariableTypes" = true, "compositeLiteralFields" = true, "compositeLiteralTypes" = true, "constantValues" = true, "functionTypeParameters" = true, "parameterNames" = true, "rangeVariableTypes" = true }, "ui.completion.usePlaceholders" = true, "formatting.gofumpt" = true }
+
+
+[language-server.golangci-lint]
+command = "golangci-lint-langserver"
+
+[[language]]
+name = "go"
+auto-format = true
+formatter = { command = "goimports" }
+language-servers = [ "gopls", "golangci-lint" ]
+
+# Весь дебаггер пихаем прямо сюда, со всеми полями
+[language.debugger]
+name = "delve"
+transport = "tcp"
+command = "dlv"
+args = ["dap", "--listen", "127.0.0.1:{{port}}"]
+
+[[language.debugger.templates]]
+name = "debug"
+request = "launch"
+completion = [ { name = "entrypoint", completion = "filename" } ]
+args = { mode = "debug", program = "{{entrypoint}}" }

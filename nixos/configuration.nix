@@ -96,6 +96,13 @@
     bash-language-server
     starship
     taplo
+    # go
+    go
+    gopls
+    delve
+    gotools
+    golangci-lint
+    golangci-lint-langserver
   ];
 
   environment.variables = {

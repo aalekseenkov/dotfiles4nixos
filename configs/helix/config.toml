@@ -14,6 +14,10 @@ default-yank-register = '+'
 auto-format = true
 trim-trailing-whitespace = true
 
+[editor.lsp]
+display-messages = true
+display-inlay-hints = true
+
 [editor.indent-guides]
 render = true
 
@@ -41,9 +45,14 @@ insert = "bar"
 normal = "block"
 select = "underline"
 
+# [editor.statusline]
+# left = ["mode", "spacer", "spinner", "spacer", "file-name", "spacer", "file-modification-indicator"]
+# right = ["diagnostics", "selections", "position", "position-percentage", "file-encoding", "file-type"]
+# separator = "│"
 [editor.statusline]
 left = ["mode", "spacer", "spinner", "spacer", "file-name", "spacer", "file-modification-indicator"]
-right = ["diagnostics", "selections", "position", "position-percentage", "file-encoding", "file-type"]
+center = ["version-control"]
+right = ["diagnostics", "spacer", "selections", "position", "position-percentage", "spacer", "file-encoding", "file-type"]
 separator = "│"
 
 [editor.file-picker]
