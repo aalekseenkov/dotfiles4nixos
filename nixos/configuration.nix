@@ -96,6 +96,7 @@
     bash-language-server
     starship
     taplo
+    jq
     # go
     go
     gopls
