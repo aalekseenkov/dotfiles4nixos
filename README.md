@@ -55,49 +55,50 @@ in
 
 ## Development Stack
 
+### Ansible
+- `ansible` - radically simple IT automation
+- `ansible-lint` - best practices checker for Ansible
+- `ansible-language-server` - language server for Ansible
 ### CLI
 - `zsh` - an extended interactive shell and command language interpreter
 - `starship` - minimal, blazing fast, and extremely customizable prompt for any shell
 - `zellij` - terminal workspace with batteries included
 
-### Helix with LSPs
+### Editors
 - `helix` - post-modern modal text editor
-  - `ansible-language-server`
-  - `yaml-language-server`
-  - `bash-language-server`
-  - `nil`
-  - `marksman`
-  - `gopls`
-
-### Tools
-- `docker` - open source project to pack, ship and run any application as a lightweight container
-- `jq` - lightweight and flexible command-line JSON processor
-- `yazi` - blazing fast terminal file manager written in Rust, based on async I/O
-- `bottom` - cross-platform graphical process/system monitor with a customizable interface
-- `taplo` - TOML toolkit written in Rust
-
-### Ansible
-- `ansible` - radically simple IT automation
-- `ansible-lint` - best practices checker for Ansible
 
 ### GitLab
 - `git` - distributed version control system
 - `glab` - GitLab CLI tool bringing GitLab to the command line
 
-### Secrets
-- `sops` - simple and flexible tool for managing secrets
-- `age` - modern encryption tool with small explicit keys
+### Languages
+
+- #### Go
+  - `go` - Go programming language
+  - `delve` - debugger for the Go programming language
+  - `gotools` - additional tools for Go development
+  - `gopls` - official language server for the Go language
+  - `golangci-lint` - fast linters Runner for Go
+  - `golangci-lint-langserver` - language server for golangci-lint
 
 ### Markdown
 - `markdownlint-cli` - command line interface for MarkdownLint
 - `python311Packages.grip` - preview GitHub Markdown files like Readme locally before committing them
+- `marksman` - language server for Markdown
 
-### Go
-- `go` - Go programming language
-- `delve` - debugger for the Go programming language
-- `gotools` - additional tools for Go development
-- `golangci-lint` - fast linters Runner for Go
-- `golangci-lint-langserver` - language server for golangci-lint
+### Misc
+- `docker` - open source project to pack, ship and run any application as a lightweight container
+- `jq` - lightweight and flexible command-line JSON processor
+- `yazi` - blazing fast terminal file manager written in Rust, based on async I/O
+- `bottom` - cross-platform graphical process/system monitor with a customizable interface
+- `taplo` - TOML toolkit written in Rust
+- `yaml-language-server` - language server for YAML files
+- `bash-language-server` - language server for Bash
+- `nil` - yet another language server for Nix
+
+### Secrets
+- `sops` - simple and flexible tool for managing secrets
+- `age` - modern encryption tool with small explicit keys
 
 ## Deploy SSH Keys
 
