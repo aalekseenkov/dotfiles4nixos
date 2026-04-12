@@ -53,18 +53,51 @@ in
 *   **Verified Status** - ensure your public SSH key is added to GitHub as a **Signing Key** (not just an Authentication key) to get the "Verified" badge.
 *   **Private Data** - `hardware-configuration.nix` and `local-networking.nix` are excluded from commits to keep your infrastructure private.
 
-## Tooling Stack
+## Development Stack
 
-*   **Editor:** Helix (`hx`) with specialized LSPs:
-    *   `ansible-language-server` (Forced Unstable version)
-    *   `yaml-language-server`
-    *   `bash-language-server`
-    *   `nil` (Nix LSP)
-    *   `marksman` (Markdown LSP)
-*   **Shell:** Zsh + **Starship**. Features a custom **two-line prompt** for deep directory navigation and Git status visibility.
-*   **Utils:** Yazi (terminal file manager), Docker, and Zram support.
+### CLI
+- `zsh` - an extended interactive shell and command language interpreter
+- `starship` - minimal, blazing fast, and extremely customizable prompt for any shell
+- `zellij` - terminal workspace with batteries included
 
-*The list is updated as it develops.*
+### Helix with LSPs
+- `helix` - post-modern modal text editor
+  - `ansible-language-server`
+  - `yaml-language-server`
+  - `bash-language-server`
+  - `nil`
+  - `marksman`
+  - `gopls`
+
+### Tools
+- `docker` - open source project to pack, ship and run any application as a lightweight container
+- `jq` - lightweight and flexible command-line JSON processor
+- `yazi` - blazing fast terminal file manager written in Rust, based on async I/O
+- `bottom` - cross-platform graphical process/system monitor with a customizable interface
+- `taplo` - TOML toolkit written in Rust
+
+### Ansible
+- `ansible` - radically simple IT automation
+- `ansible-lint` - best practices checker for Ansible
+
+### GitLab
+- `git` - distributed version control system
+- `glab` - GitLab CLI tool bringing GitLab to the command line
+
+### Secrets
+- `sops` - simple and flexible tool for managing secrets
+- `age` - modern encryption tool with small explicit keys
+
+### Markdown
+- `markdownlint-cli` - command line interface for MarkdownLint
+- `python311Packages.grip` - preview GitHub Markdown files like Readme locally before committing them
+
+### Go
+- `go` - Go programming language
+- `delve` - debugger for the Go programming language
+- `gotools` - additional tools for Go development
+- `golangci-lint` - fast linters Runner for Go
+- `golangci-lint-langserver` - language server for golangci-lint
 
 ## Deploy SSH Keys
 
@@ -72,6 +105,7 @@ in
 
 ```
 # Bastion (NixOS)
+
 # Initialize Environment
 mkdir -p ~/.ssh && chmod 700 ~/.ssh
 

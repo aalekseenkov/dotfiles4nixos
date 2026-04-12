@@ -92,11 +92,14 @@
     glab
     nil
     yaml-language-server
-    marksman
     bash-language-server
     starship
     taplo
     jq
+    # markdown
+    marksman
+    markdownlint-cli
+    python311Packages.grip
     # go
     go
     gopls

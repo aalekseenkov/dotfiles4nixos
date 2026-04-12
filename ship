@@ -43,7 +43,7 @@ if [ ! -f "$NETWORK_CONFIG" ]; then
 { ... }: {
   networking = {
     hostName = "$HOST";
-    firewall.allowedTCPPorts = [ 22 80 443 ];
+    firewall.allowedTCPPorts = [ 22 80 443 8080 ];
     networkmanager.enable = false;
     useDHCP = false;
     interfaces."$IFACE" = {
@@ -60,7 +60,7 @@ EOF
 { ... }: {
   networking = {
     hostName = "$HOST";
-    firewall.allowedTCPPorts = [ 22 80 443 ];
+    firewall.allowedTCPPorts = [ 22 80 443 8080 ];
     networkmanager.enable = true;
   };
 }
