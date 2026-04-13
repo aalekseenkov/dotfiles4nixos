@@ -116,6 +116,21 @@
     ANSIBLE_HOME = "/home/${user}/.ansible";
   };
 
+  environment.shellAliases = {
+    mdview = "grip 0.0.0.0:8080";
+  };
+
+  # environment.interactiveShellInit = ''
+  #   hx() {
+  #     # 1. Set the Helix Background
+  #     echo -ne "\033]11;#3B224C\007"
+  #     # 2. Launch Helix
+  #     command hx "$@"
+  #     # 3. Return Terminal Background
+  #     echo -ne "\033]11;#008080\007"
+  #   }
+  # '';
+
   programs.git = {
     enable = true;
     config = {
@@ -148,17 +163,6 @@
     promptInit = ''eval "$(${pkgs.starship}/bin/starship init zsh)"'';
   };
 
-  # environment.interactiveShellInit = ''
-  #   hx() {
-  #     # 1. Set the Helix Background
-  #     echo -ne "\033]11;#3B224C\007"
-  #     # 2. Launch Helix
-  #     command hx "$@"
-  #     # 3. Return Terminal Background
-  #     echo -ne "\033]11;#008080\007"
-  #   }
-  # '';
-
   # --- AUTOMATION (SYMLINKS & PERMISSIONS) ---
   system.activationScripts.postInstall = {
     text = ''
@@ -180,6 +184,7 @@
 
       mkdir -p "$USER_HOME/.cache/yaml-language-server"
       mkdir -p "$USER_HOME/.ansible/tmp"
+      mkdir -p "$USER_HOME/.grip"
 
       ln -sf "$DOTS/helix/config.toml" "$CONF/helix/config.toml"
       ln -sf "$DOTS/helix/languages.toml" "$CONF/helix/languages.toml"
@@ -188,9 +193,12 @@
       ln -sf "$DOTS/zellij/config.kdl" "$CONF/zellij/config.kdl"
       ln -sf "$DOTS/zellij/sre.kdl" "$CONF/zellij/layouts/sre.kdl"
 
+      ln -sf "$DOTS/grip/settings.py" "$USER_HOME/.grip/settings.py"
+
       chown -R ${user}:users "$CONF"
       chown -R ${user}:users "$USER_HOME/.cache"
       chown -R ${user}:users "$USER_HOME/.ansible"
+      chown -R ${user}:users "$USER_HOME/.grip"
     '';
     deps = [ "users" ];
   };

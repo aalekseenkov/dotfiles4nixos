@@ -144,6 +144,23 @@ icacls config /grant:r "${env:USERNAME}:F"
 icacls config /grant:r SYSTEM:F
 ```
 
+## GitHub/Lab Markdown Preview
+
+To see the exact README.md result before committing and pushing to GitHub/GitLab we can use `grip`.
+
+```
+# Bastion (NixOS)
+cd myrepo
+# To render *.md of a repository
+mdview
+```
+
+`mdview` - an alias for `grip 0.0.0.0:8080`
+
+Now we can open any browser on the remote host and visit `http://BASTION-IP:8080`. If we have any NixOS Desktop and Bastion on the same workstation, we could visit `http://localhost:8080`.
+
+Alternatively, we can view other files via to `http://BASTION-IP:8080/file.md` since `grip` supports relative URLs.
+
 ## GitLab CLI Setup and Usage
 
 ### 1. Authentication Token
