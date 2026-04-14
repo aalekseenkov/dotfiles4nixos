@@ -1,8 +1,8 @@
-# Bastion 2 (Managed SRE Environment)
+# Bastion II - Jump Host 4 SRE & DevOps
 
-> A fully declarative, reproducible, and secure gateway for infrastructure automation.
+My Reproducible Development Environment: Helix + Zellij + Starship + WezTerm on NixOS
 
-Powered by **NixOS 25.11**, **Flakes**, and **Helix**.
+> Powered by **NixOS 25.11**, **Flakes**, and **Helix** with LSPs.
 
 ## The Engine Room: System Architecture
 
@@ -19,7 +19,7 @@ Powered by **NixOS 25.11**, **Flakes**, and **Helix**.
 
 ## Ship It Smart and Fast
 
-The `ship` script is the orchestrator of the **Bastion 2** environment. It automates the "dirty work" of staging local hardware/network configurations and applying system changes safely through NixOS Flakes.
+The `ship` script is the orchestrator of the **Bastion II** environment. It automates the "dirty work" of staging local hardware/network configurations and applying system changes safely through NixOS Flakes.
 
 ### Core Commands:
 * `./ship` - **daily update**. The standard way to rebuild your system. It uses existing hardware and network configurations to apply updates to your software or dotfiles.
