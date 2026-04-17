@@ -1,4 +1,29 @@
 keybinds clear-defaults=true {
+    // Leader key
+    shared_except "locked" {
+        bind "Ctrl a" { SwitchToMode "Tmux"; }
+    }
+
+    // Actions after Ctrl+a
+    tmux {
+        bind "d" { NewPane "down"; SwitchToMode "Normal"; }
+        bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
+        bind "h" { MoveFocus "left"; SwitchToMode "Normal"; }
+        bind "j" { MoveFocus "down"; SwitchToMode "Normal"; }
+        bind "k" { MoveFocus "up"; SwitchToMode "Normal"; }
+        bind "l" { MoveFocus "right"; SwitchToMode "Normal"; }
+        bind "n" { NewPane "right"; SwitchToMode "Normal"; }
+        bind "o" { Detach; }
+        bind "q" { CloseFocus; SwitchToMode "Normal"; }
+        bind "x" { Quit; }
+
+        // to exit from tmux-mode (Esc or Ctrl+a)
+        bind "Esc" { SwitchToMode "Normal"; }
+        bind "Ctrl a" { Write 1; SwitchToMode "Normal"; }
+    }
+}
+
+keybinds clear-defaults=true {
     shared_except "locked" {
         bind "Ctrl d" { NewPane "down"; SwitchToMode "normal"; }
         bind "Ctrl f" { ToggleFocusFullscreen; SwitchToMode "normal"; }
