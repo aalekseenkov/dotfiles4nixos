@@ -89,6 +89,7 @@
     sops
     age
     git
+    lazygit
     glab
     nil
     yaml-language-server

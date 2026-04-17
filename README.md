@@ -67,8 +67,9 @@ in
 ### Editors
 - `helix` - post-modern modal text editor
 
-### GitLab
+### Git
 - `git` - distributed version control system
+- `lazygit` - simple terminal UI for git commands
 - `glab` - GitLab CLI tool bringing GitLab to the command line
 
 ### Languages

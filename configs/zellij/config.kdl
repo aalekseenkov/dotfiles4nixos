@@ -6,6 +6,18 @@ keybinds clear-defaults=true {
 
     // Actions after Ctrl+a
     tmux {
+         bind "g" {
+            // Run "lazygit" {
+            Run "sh" "-c" "lazygit && zellij action write-chars ':reload-all' && zellij action write 13" {
+                floating true
+                close_on_exit true
+                width "90%"
+                height "90%"
+                x "5%"
+                y "5%"
+            };
+            SwitchToMode "Normal";
+        }
         bind "d" { NewPane "down"; SwitchToMode "Normal"; }
         bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
         bind "h" { MoveFocus "left"; SwitchToMode "Normal"; }
@@ -20,21 +32,6 @@ keybinds clear-defaults=true {
         // to exit from tmux-mode (Esc or Ctrl+a)
         bind "Esc" { SwitchToMode "Normal"; }
         bind "Ctrl a" { Write 1; SwitchToMode "Normal"; }
-    }
-}
-
-keybinds clear-defaults=true {
-    shared_except "locked" {
-        bind "Ctrl d" { NewPane "down"; SwitchToMode "normal"; }
-        bind "Ctrl f" { ToggleFocusFullscreen; SwitchToMode "normal"; }
-        bind "Ctrl h" { MoveFocus "left"; SwitchToMode "normal"; }
-        bind "Ctrl j" { MoveFocus "down"; SwitchToMode "normal"; }
-        bind "Ctrl k" { MoveFocus "up"; SwitchToMode "normal"; }
-        bind "Ctrl l" { MoveFocus "right"; SwitchToMode "normal"; }
-        bind "Ctrl n" { NewPane "right"; SwitchToMode "normal"; }
-        bind "Ctrl o" { Detach; }
-        bind "Ctrl q" { CloseFocus; SwitchToMode "normal"; }
-        bind "Ctrl x" { Quit; }
     }
 }
 

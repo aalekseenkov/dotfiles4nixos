@@ -38,7 +38,7 @@ nbsp = "⍽"
 nnbsp = "␣"
 tab = "→"
 newline = "⏎"
-tabpad = "·" # Tabs will look like "→···" (depending on tab width)
+tabpad = "·"  # Tabs will look like "→···" (depending on tab width)
 
 [editor.cursor-shape]
 insert = "bar"
@@ -50,9 +50,26 @@ select = "underline"
 # right = ["diagnostics", "selections", "position", "position-percentage", "file-encoding", "file-type"]
 # separator = "│"
 [editor.statusline]
-left = ["mode", "spacer", "spinner", "spacer", "file-name", "spacer", "file-modification-indicator"]
+left = [
+  "mode",
+  "spacer",
+  "spinner",
+  "spacer",
+  "file-name",
+  "spacer",
+  "file-modification-indicator",
+]
 center = ["version-control"]
-right = ["diagnostics", "spacer", "selections", "position", "position-percentage", "spacer", "file-encoding", "file-type"]
+right = [
+  "diagnostics",
+  "spacer",
+  "selections",
+  "position",
+  "position-percentage",
+  "spacer",
+  "file-encoding",
+  "file-type",
+]
 separator = "│"
 
 [editor.file-picker]
@@ -60,3 +77,4 @@ hidden = false
 
 [keys.normal]
 "esc" = ["collapse_selection", "keep_primary_selection"]
+"R" = [":reload-all", ":lsp-restart", ":config-reload"]
