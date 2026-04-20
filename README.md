@@ -204,12 +204,20 @@ glab auth login
 
 ### 6. Pipeline View Interactivity
 
-| Key | Action |
-| :--- | :--- |
-| `Enter` | View logs for the selected job |
-| `R` | Retry the selected job |
-| `C` | Cancel the selected job (if running) |
-| `Q` | Exit the view |
+| Key     | Action                               |
+| :---    | :---                                 |
+| `Enter` | View logs for the selected job       |
+| `R`     | Retry the selected job               |
+| `C`     | Cancel the selected job (if running) |
+| `Q`     | Exit the view                        |
+
+## Helix Additional User Sub-mode
+
+Accessed by typing `+` in normal mode.
+
+| Key  | Description                                    |
+| :--- | :---                                           |
+| `r`  | Reload all the buffers, LSPs and configuration |
 
 ## Miscellaneous
 
@@ -224,9 +232,50 @@ ssh-keygen -t ed25519 -C "bastion-v2"
 git remote set-url origin git@github.com:OWNER/REPOSITORY.git
 git remote -v
 ```
+## Zellij User Keybinds
+```
+keybinds clear-defaults=true {
+    // Leader key
+    shared_except "locked" {
+        bind "Ctrl a" { SwitchToMode "Tmux"; }
+    }
+
+    // Actions after Ctrl+a
+    tmux {
+         bind "g" {
+            // Run "lazygit" {
+            Run "sh" "-c" "lazygit && zellij action write-chars ':reload-all' && zellij action write 13" {
+                floating true
+                close_on_exit true
+                width "90%"
+                height "90%"
+                x "5%"
+                y "5%"
+            };
+            SwitchToMode "Normal";
+        }
+        bind "d" { NewPane "down"; SwitchToMode "Normal"; }
+        bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
+        bind "h" { MoveFocus "left"; SwitchToMode "Normal"; }
+        bind "j" { MoveFocus "down"; SwitchToMode "Normal"; }
+        bind "k" { MoveFocus "up"; SwitchToMode "Normal"; }
+        bind "l" { MoveFocus "right"; SwitchToMode "Normal"; }
+        bind "n" { NewPane "right"; SwitchToMode "Normal"; }
+        bind "o" { Detach; }
+        bind "q" { CloseFocus; SwitchToMode "Normal"; }
+        bind "x" { Quit; }
+
+        // to exit from tmux-mode (Esc or Ctrl+a)
+        bind "Esc" { SwitchToMode "Normal"; }
+        bind "Ctrl a" { Write 1; SwitchToMode "Normal"; }
+    }
+}
+```
 
 ## Useful Links
-[Installing NixOS in a VirtualBox guest](https://nixos.org/manual/nixos/stable/#sec-installing-virtualbox-guest)
+
+- [Installing NixOS in a VirtualBox guest](https://nixos.org/manual/nixos/stable/#sec-installing-virtualbox-guest)
+- [Helix Documentation](https://docs.helix-editor.com/)
 
 ---
 *Maintained by aalekseenkov. "Ship it!"*
