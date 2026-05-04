@@ -1,3 +1,14 @@
+###############################################################################
+# LANGUAGE SERVER CONFIGURATION
+# Helix Version: 25.07.1
+###############################################################################
+
+# Simple Completion Language Server
+# Provides word-based completion from open buffers (mimics Vim's Ctrl-n/Ctrl-p)
+[language-server.simple-completion-ls]
+command = "simple-completion-language-server"
+config = { feature_words = true, max_completion_items = 20 }
+
 ########
 # YAML #
 ########
@@ -11,7 +22,10 @@ name = "yaml"
 scope = "source.yaml"
 file-types = ["yml", "yaml", "json"]
 auto-format = true
-language-servers = [{ name = "yaml-language-server" }]
+language-servers = [
+  { name = "yaml-language-server" },
+  { name = "simple-completion-ls" },
+]
 
 ###########
 # ANSIBLE #
@@ -39,7 +53,7 @@ roots = [
   "playbook.yml",
 ]
 auto-format = true
-language-servers = [{ name = "ansible-ls" }]
+language-servers = [{ name = "ansible-ls" }, { name = "simple-completion-ls" }]
 
 ########
 # BASH #
@@ -53,7 +67,7 @@ name = "bash"
 scope = "source.bash"
 file-types = ["sh", "bash"]
 auto-format = true
-language-servers = [{ name = "bash-ls" }]
+language-servers = [{ name = "bash-ls" }, { name = "simple-completion-ls" }]
 
 ########
 # TOML #
@@ -67,7 +81,7 @@ name = "toml"
 scope = "source.toml"
 file-types = ["toml"]
 auto-format = true
-language-servers = [{ name = "taplo" }]
+language-servers = [{ name = "taplo" }, { name = "simple-completion-ls" }]
 
 #######
 # NIX #
@@ -80,7 +94,7 @@ name = "nix"
 scope = "source.nix"
 file-types = ["nix"]
 auto-format = true
-language-servers = [{ name = "nil" }]
+language-servers = [{ name = "nil" }, { name = "simple-completion-ls" }]
 
 ######
 # GO #
@@ -89,17 +103,20 @@ language-servers = [{ name = "nil" }]
 command = "gopls"
 config = { "ui.inlayhint.hints" = { "assignVariableTypes" = true, "compositeLiteralFields" = true, "compositeLiteralTypes" = true, "constantValues" = true, "functionTypeParameters" = true, "parameterNames" = true, "rangeVariableTypes" = true }, "ui.completion.usePlaceholders" = true, "formatting.gofumpt" = true }
 
-
 [language-server.golangci-lint]
 command = "golangci-lint-langserver"
 
 [[language]]
 name = "go"
+scope = "source.go"
 auto-format = true
 formatter = { command = "goimports" }
-language-servers = [ "gopls", "golangci-lint" ]
+language-servers = [
+  { name = "gopls" },
+  { name = "golangci-lint" },
+  { name = "simple-completion-ls" },
+]
 
-# Весь дебаггер пихаем прямо сюда, со всеми полями
 [language.debugger]
 name = "delve"
 transport = "tcp"
@@ -109,5 +126,53 @@ args = ["dap", "--listen", "127.0.0.1:{{port}}"]
 [[language.debugger.templates]]
 name = "debug"
 request = "launch"
-completion = [ { name = "entrypoint", completion = "filename" } ]
+completion = [{ name = "entrypoint", completion = "filename" }]
 args = { mode = "debug", program = "{{entrypoint}}" }
+
+###############################################################################
+# INFRASTRUCTURE & SYSTEM ADMINISTRATION
+###############################################################################
+
+# Docker & Containers
+[[language]]
+name = "dockerfile"
+scope = "source.dockerfile"
+language-servers = [
+  { name = "docker-langserver" },
+  { name = "simple-completion-ls" },
+]
+
+# Terraform / HCL
+[[language]]
+name = "hcl"
+scope = "source.hcl"
+language-servers = [
+  { name = "terraform-ls" },
+  { name = "simple-completion-ls" },
+]
+
+# Plain Text & System Configs
+[[language]]
+name = "text"
+scope = "source.txt"
+file-types = [
+  "txt",
+  "log",
+  "hosts",
+  "resolv.conf",
+  "authorized_keys",
+  "README",
+  "NOTES",
+]
+language-servers = [{ name = "simple-completion-ls" }]
+
+# Documentation & Generic Configs
+[[language]]
+name = "markdown"
+scope = "source.md"
+language-servers = [{ name = "simple-completion-ls" }]
+
+[[language]]
+name = "ini"
+scope = "source.ini"
+language-servers = [{ name = "simple-completion-ls" }]

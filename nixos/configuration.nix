@@ -92,6 +92,7 @@
     lazygit
     glab
     nil
+    simple-completion-language-server
     yaml-language-server
     bash-language-server
     starship
