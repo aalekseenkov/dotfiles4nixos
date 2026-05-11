@@ -95,6 +95,7 @@
     simple-completion-language-server
     yaml-language-server
     bash-language-server
+    jinja-lsp
     starship
     taplo
     jq
