@@ -129,6 +129,17 @@ request = "launch"
 completion = [{ name = "entrypoint", completion = "filename" }]
 args = { mode = "debug", program = "{{entrypoint}}" }
 
+[language-server.jinja-lsp]
+command = "jinja-lsp"
+
+[[language]]
+name = "jinja"
+scope = "source.jinja"
+injection-regex = "jinja"
+file-types = ["jinja", "jinja2", "j2", "html"]
+auto-format = true
+language-servers = [{ name = "jinja-lsp" }, { name = "simple-completion-ls" }]
+
 ###############################################################################
 # INFRASTRUCTURE & SYSTEM ADMINISTRATION
 ###############################################################################
@@ -171,6 +182,7 @@ language-servers = [{ name = "simple-completion-ls" }]
 name = "markdown"
 scope = "source.md"
 language-servers = [{ name = "simple-completion-ls" }]
+auto-pairs = { '(' = ')', '{' = '}', '[' = ']', '"' = '"', "'" = "'" }
 
 [[language]]
 name = "ini"
