@@ -80,6 +80,7 @@
     pkgs-unstable.yazi
     pkgs-unstable.ansible-language-server
     pkgs-unstable.bottom
+    pkgs-unstable.fastfetch
     # pkgs-unstable.k9s
     # kubectl
     # kubernetes-helm

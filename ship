@@ -79,7 +79,8 @@ fi
 
 # 4. GIT STAGING (Make visible for Nix)
 echo "📦 Adding local files to Git index for build..."
-git -C "$DOTFILES_DIR" add -f "$NETWORK_CONFIG" "$HARDWARE_CONFIG"
+git -C "$DOTFILES_DIR" add flake.nix flake.lock
+git -C "$DOTFILES_DIR" add -N "$NETWORK_CONFIG" "$HARDWARE_CONFIG"
 
 # 5. REBUILD (Ship it!)
 echo "⚙️  Rebuilding system via Flake..."
@@ -99,11 +100,11 @@ else
     exit 1
 fi
 
-# 6. GIT CLEANUP (The "SRE Magic")
-echo "🛡️  Resetting index to keep local configs private..."
-git -C "$DOTFILES_DIR" reset "$NETWORK_CONFIG" "$HARDWARE_CONFIG" > /dev/null 2>&1
+# ?. GIT CLEANUP (The "SRE Magic")
+# echo "🛡️  Resetting index to keep local configs private..."
+# git -C "$DOTFILES_DIR" reset "$NETWORK_CONFIG" "$HARDWARE_CONFIG" > /dev/null 2>&1
 
-# 7. Network Refresh & Post-Deployment Logic
+# 6. Network Refresh & Post-Deployment Logic
 echo "🔄 Finalizing deployment..."
 
 if [ "$RECONF" = true ] || [ "$DHCP_MODE" = true ]; then

@@ -1,16 +1,22 @@
 {
-  description = "AVA NixOS Flake Configuration";
+  description = "AVA NixOS 25.11 Flake Configuration";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, ... }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      nixpkgs-unstable,
+      ...
+    }:
     let
       system = "x86_64-linux";
       # --- Identity Settings ---
-      user = "ava"; 
+      user = "ava";
       gitName = "Andrew Alekseenkov";
       gitEmail = "andrew.alekseenkov@yandex.by";
       # -------------------------
@@ -18,10 +24,18 @@
         inherit system;
         config.allowUnfree = true;
       };
-    in {
+    in
+    {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
-        specialArgs = { inherit pkgs-unstable user gitName gitEmail; };
+        specialArgs = {
+          inherit
+            pkgs-unstable
+            user
+            gitName
+            gitEmail
+            ;
+        };
         modules = [
           ./nixos/configuration.nix
           ./nixos/hardware-configuration.nix
@@ -29,4 +43,3 @@
       };
     };
 }
-
