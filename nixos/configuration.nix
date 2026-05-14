@@ -87,6 +87,8 @@
     # terraform
     ansible
     ansible-lint
+    yaml-language-server
+    yamlfmt
     sops
     age
     git
@@ -94,9 +96,7 @@
     glab
     nil
     simple-completion-language-server
-    yaml-language-server
     bash-language-server
-    jinja-lsp
     starship
     taplo
     jq
@@ -164,6 +164,10 @@
       zsh-newuser-install() { : }
     '';
 
+    shellAliases = {
+      gl = "git log --oneline --all --graph";
+    };
+
     promptInit = ''eval "$(${pkgs.starship}/bin/starship init zsh)"'';
   };
 
@@ -211,5 +215,13 @@
     "nix-command"
     "flakes"
   ];
+
+  # --- AUTOMATIC GARBAGE COLLECTION ---
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
+
   system.stateVersion = "25.11";
 }
