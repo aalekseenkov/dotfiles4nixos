@@ -37,9 +37,7 @@
 
   # --- VIRTUALIZATION & HARDWARE ---
   fonts.packages = [
-    pkgs.nerd-fonts.intone-mono
-    pkgs.nerd-fonts.iosevka
-    pkgs.nerd-fonts.jetbrains-mono
+    pkgs.nerd-fonts.blex-mono
   ];
   virtualisation.virtualbox.guest.enable = true;
   virtualisation.docker.enable = true;
