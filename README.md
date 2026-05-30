@@ -1,16 +1,30 @@
-# Bastion II - Jump Host 4 SRE & DevOps
+# Bastion 26.05 - SRE/DevOps Jump Host
 
-My Reproducible Development Environment: Helix + Zellij + Starship + WezTerm on NixOS
+The Reproducible Development Environment: Helix + Zellij + Starship + WezTerm
 
-> Powered by **NixOS 25.11**, **Flakes**, and **Helix** with LSPs.
+> Powered by **NixOS 26.05**, **Flakes**, and **Helix** with LSPs.
 
 ## The Engine Room: System Architecture
 
 ![dotfiles4nixos](./dotfiles4nixos.png)
 
+## Table of Contents
+- [Initial Setup](#initial-setup)
+- [Ship It Smart and Fast](#ship-it-smart-and-fast)
+- [Customization](#customization)
+- [Deploy SSH Keys](#deploy-ssh-keys)
+- [Development Stack](#development-stack)
+- [GitLab CLI Setup and Usage](#gitlab-cli-setup-and-usage)
+- [Helix Additional User Sub-mode](#helix-additional-user-sub-mode)
+- [Markdown Preview](#markdown-preview)
+- [Miscellaneous](#miscellaneous)
+- [SSH Signing and Private Data](#ssh-signing-and-private-data)
+- [Zellij User Keybinds](#zellij-user-keybinds)
+- [Useful Links](#useful-links)
+
 ## Initial Setup
 
-1. Install **NixOS 25.11** (No Desktop)
+1. Install NixOS (No Desktop)
 2. Login as your user
 3. `nix-shell -p git`
 4. `git clone https://github.com/aalekseenkov/dotfiles4nixos.git ~/.dotfiles`
@@ -47,11 +61,49 @@ let
 in
 ```
 
-## Git Signing & Security
+## Deploy SSH Keys
 
-*   **SSH Signing** - this repo is configured to sign commits using your SSH key.
-*   **Verified Status** - ensure your public SSH key is added to GitHub as a **Signing Key** (not just an Authentication key) to get the "Verified" badge.
-*   **Private Data** - `hardware-configuration.nix` and `local-networking.nix` are excluded from commits to keep your infrastructure private.
+### 1. Windows Host -> NixOS Bastion -> Remotes
+
+```
+# Bastion (NixOS)
+
+# Initialize Environment
+mkdir -p ~/.ssh && chmod 700 ~/.ssh
+
+# Windows Host (Powershell)
+# Inbound access (Windows to Bastion)
+scp $HOME\.ssh\id_ed25519_windows.pub your_user@IP:~/.ssh/authorized_keys
+# Outbound identities (Bastion to Remotes)
+scp $HOME\.ssh\id_ed25519_git your_user@IP:~/.ssh/id_ed25519_git
+scp $HOME\.ssh\id_ed25519_git.pub your_user@IP:~/.ssh/id_ed25519_git.pub
+
+# Bastion (NixOS)
+# Permission Hardening
+chmod 600 ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/id_ed25519_git
+chmod 644 ~/.ssh/id_ed25519_git.pub
+
+# SSH Keys Quick Testing
+ssh -T git@github.com
+
+# The six steps to config SSH on Windows Host
+# Powershell Administration
+# 1. Navigate to the SSH directory
+cd $env:USERPROFILE\.ssh
+# 2. Open SSH config
+notepad config
+# 3. Add and update your host into config file
+Host bastion
+    HostName 192.168.100.100
+    User ava
+# 4. Remove inherited permissions (isolate the file)
+icacls config /inheritance:r
+# 5. Grant Full Control only to the current user
+icacls config /grant:r "${env:USERNAME}:F"
+# 6. Grant Full Control to the SYSTEM account
+icacls config /grant:r SYSTEM:F
+```
 
 ## Development Stack
 
@@ -100,50 +152,6 @@ in
 ### Secrets
 - `sops` - simple and flexible tool for managing secrets
 - `age` - modern encryption tool with small explicit keys
-
-## Deploy SSH Keys
-
-### 1. Windows Host -> NixOS Bastion -> Remotes
-
-```
-# Bastion (NixOS)
-
-# Initialize Environment
-mkdir -p ~/.ssh && chmod 700 ~/.ssh
-
-# Windows Host (Powershell)
-# Inbound access (Windows to Bastion)
-scp $HOME\.ssh\id_ed25519_windows.pub your_user@IP:~/.ssh/authorized_keys
-# Outbound identities (Bastion to Remotes)
-scp $HOME\.ssh\id_ed25519_git your_user@IP:~/.ssh/id_ed25519_git
-scp $HOME\.ssh\id_ed25519_git.pub your_user@IP:~/.ssh/id_ed25519_git.pub
-
-# Bastion (NixOS)
-# Permission Hardening
-chmod 600 ~/.ssh/authorized_keys
-chmod 600 ~/.ssh/id_ed25519_git
-chmod 644 ~/.ssh/id_ed25519_git.pub
-
-# SSH Keys Quick Testing
-ssh -T git@github.com
-
-# The six steps to config SSH on Windows Host
-# Powershell Administration
-# 1. Navigate to the SSH directory
-cd $env:USERPROFILE\.ssh
-# 2. Open SSH config
-notepad config
-# 3. Add and update your host into config file
-Host bastion
-    HostName 192.168.100.100
-    User ava
-# 4. Remove inherited permissions (isolate the file)
-icacls config /inheritance:r
-# 5. Grant Full Control only to the current user
-icacls config /grant:r "${env:USERNAME}:F"
-# 6. Grant Full Control to the SYSTEM account
-icacls config /grant:r SYSTEM:F
-```
 
 ## GitLab CLI Setup and Usage
 
@@ -232,6 +240,13 @@ ssh-keygen -t ed25519 -C "bastion-v2"
 git remote set-url origin git@github.com:OWNER/REPOSITORY.git
 git remote -v
 ```
+
+## SSH Signing and Private Data
+
+*   **SSH Signing** - this repo is configured to sign commits using your SSH key.
+*   **Verified Status** - ensure your public SSH key is added to GitHub as a **Signing Key** (not just an Authentication key) to get the "Verified" badge.
+*   **Private Data** - `hardware-configuration.nix` and `local-networking.nix` are excluded from commits to keep your infrastructure private.
+
 ## Zellij User Keybinds
 ```
 keybinds clear-defaults=true {
@@ -240,10 +255,22 @@ keybinds clear-defaults=true {
         bind "Ctrl a" { SwitchToMode "Tmux"; }
     }
 
-    // Actions after Ctrl+a
+    // Actions after Ctrl+a (Tmux mode)
     tmux {
-         bind "g" {
-            // Run "lazygit" {
+        // Helix ga style: toggle back and forth between active panes
+        bind ";" { FocusPreviousPane; SwitchToMode "Normal"; }
+
+        // Enter scrollback / search mode
+        bind "[" { SwitchToMode "Scroll"; }
+
+        // Fast pane resizing (hold Shift while in tmux mode)
+        bind "H" { Resize "Increase left"; }
+        bind "J" { Resize "Increase down"; }
+        bind "K" { Resize "Increase up"; }
+        bind "L" { Resize "Increase right"; }
+
+        // Launch lazygit in a floating window and reload editor buffers on close
+        bind "g" {
             Run "sh" "-c" "lazygit && zellij action write-chars ':reload-all' && zellij action write 13" {
                 floating true
                 close_on_exit true
@@ -254,6 +281,8 @@ keybinds clear-defaults=true {
             };
             SwitchToMode "Normal";
         }
+
+        // Pane management and navigation
         bind "d" { NewPane "down"; SwitchToMode "Normal"; }
         bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
         bind "h" { MoveFocus "left"; SwitchToMode "Normal"; }
@@ -265,9 +294,34 @@ keybinds clear-defaults=true {
         bind "q" { CloseFocus; SwitchToMode "Normal"; }
         bind "x" { Quit; }
 
-        // to exit from tmux-mode (Esc or Ctrl+a)
+        // Exit from tmux-mode (Esc or passthrough Ctrl+a to terminal)
         bind "Esc" { SwitchToMode "Normal"; }
         bind "Ctrl a" { Write 1; SwitchToMode "Normal"; }
+    }
+
+    // Terminal history viewer (Scrollback mode)
+    scroll {
+        bind "Esc" { SwitchToMode "Normal"; }
+        bind "e" { EditScrollback; SwitchToMode "Normal"; } // Opens scrollback buffer directly in Helix
+        bind "j" { ScrollDown; }
+        bind "k" { ScrollUp; }
+        bind "Ctrl d" { HalfPageScrollDown; }
+        bind "Ctrl u" { HalfPageScrollUp; }
+        bind "/" { SwitchToMode "EnterSearch"; SearchInput 0; }
+    }
+
+    // Search results navigation mode
+    search {
+        bind "Esc" { SwitchToMode "Scroll"; }
+        bind "Enter" { SwitchToMode "Scroll"; }
+        bind "n" { Search "down"; }
+        bind "p" { Search "up"; }
+    }
+
+    // Search input bar mode
+    entersearch {
+        bind "Esc" { SwitchToMode "Scroll"; }
+        bind "Enter" { SwitchToMode "Search"; }
     }
 }
 ```
