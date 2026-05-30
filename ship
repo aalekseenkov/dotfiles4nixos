@@ -43,6 +43,7 @@ if [ ! -f "$NETWORK_CONFIG" ]; then
 { ... }: {
   networking = {
     hostName = "$HOST";
+    useNetworkd = true;
     firewall.allowedTCPPorts = [ 22 80 443 8080 ];
     networkmanager.enable = false;
     useDHCP = false;
@@ -60,6 +61,7 @@ EOF
 { ... }: {
   networking = {
     hostName = "$HOST";
+    useNetworkd = true;
     firewall.allowedTCPPorts = [ 22 80 443 8080 ];
     networkmanager.enable = true;
   };

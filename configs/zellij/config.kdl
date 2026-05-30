@@ -4,10 +4,22 @@ keybinds clear-defaults=true {
         bind "Ctrl a" { SwitchToMode "Tmux"; }
     }
 
-    // Actions after Ctrl+a
+    // Actions after Ctrl+a (Tmux mode)
     tmux {
-         bind "g" {
-            // Run "lazygit" {
+        // Helix ga style: toggle back and forth between active panes
+        bind ";" { FocusPreviousPane; SwitchToMode "Normal"; }
+
+        // Enter scrollback / search mode
+        bind "[" { SwitchToMode "Scroll"; }
+
+        // Fast pane resizing (hold Shift while in tmux mode)
+        bind "H" { Resize "Increase left"; }
+        bind "J" { Resize "Increase down"; }
+        bind "K" { Resize "Increase up"; }
+        bind "L" { Resize "Increase right"; }
+
+        // Launch lazygit in a floating window and reload editor buffers on close
+        bind "g" {
             Run "sh" "-c" "lazygit && zellij action write-chars ':reload-all' && zellij action write 13" {
                 floating true
                 close_on_exit true
@@ -18,6 +30,8 @@ keybinds clear-defaults=true {
             };
             SwitchToMode "Normal";
         }
+
+        // Pane management and navigation
         bind "d" { NewPane "down"; SwitchToMode "Normal"; }
         bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
         bind "h" { MoveFocus "left"; SwitchToMode "Normal"; }
@@ -29,9 +43,34 @@ keybinds clear-defaults=true {
         bind "q" { CloseFocus; SwitchToMode "Normal"; }
         bind "x" { Quit; }
 
-        // to exit from tmux-mode (Esc or Ctrl+a)
+        // Exit from tmux-mode (Esc or passthrough Ctrl+a to terminal)
         bind "Esc" { SwitchToMode "Normal"; }
         bind "Ctrl a" { Write 1; SwitchToMode "Normal"; }
+    }
+
+    // Terminal history viewer (Scrollback mode)
+    scroll {
+        bind "Esc" { SwitchToMode "Normal"; }
+        bind "e" { EditScrollback; SwitchToMode "Normal"; } // Opens scrollback buffer directly in Helix
+        bind "j" { ScrollDown; }
+        bind "k" { ScrollUp; }
+        bind "Ctrl d" { HalfPageScrollDown; }
+        bind "Ctrl u" { HalfPageScrollUp; }
+        bind "/" { SwitchToMode "EnterSearch"; SearchInput 0; }
+    }
+
+    // Search results navigation mode
+    search {
+        bind "Esc" { SwitchToMode "Scroll"; }
+        bind "Enter" { SwitchToMode "Scroll"; }
+        bind "n" { Search "down"; }
+        bind "p" { Search "up"; }
+    }
+
+    // Search input bar mode
+    entersearch {
+        bind "Esc" { SwitchToMode "Scroll"; }
+        bind "Enter" { SwitchToMode "Search"; }
     }
 }
 

@@ -1,8 +1,8 @@
 {
-  description = "AVA NixOS 25.11 Flake Configuration";
+  description = "AVA NixOS 26.05 Flake Configuration";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
 

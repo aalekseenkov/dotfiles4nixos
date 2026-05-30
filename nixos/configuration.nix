@@ -73,16 +73,16 @@
   programs.nix-ld.enable = true;
 
   environment.systemPackages = with pkgs; [
-    pkgs-unstable.helix
-    pkgs-unstable.zellij
-    pkgs-unstable.yazi
-    pkgs-unstable.ansible-language-server
-    pkgs-unstable.bottom
-    pkgs-unstable.fastfetch
     # pkgs-unstable.k9s
     # kubectl
     # kubernetes-helm
     # terraform
+    helix
+    zellij
+    yazi
+    ansible-language-server
+    bottom
+    fastfetch
     ansible
     ansible-lint
     yaml-language-server
@@ -101,7 +101,7 @@
     # markdown
     marksman
     markdownlint-cli
-    python311Packages.grip
+    python3Packages.grip
     # go
     go
     gopls
@@ -164,6 +164,7 @@
 
     shellAliases = {
       gl = "git log --oneline --all --graph";
+      cl = "if [ -n \"$ZELLIJ\" ]; then clear && zellij action clear; else clear; fi";
     };
 
     promptInit = ''eval "$(${pkgs.starship}/bin/starship init zsh)"'';
