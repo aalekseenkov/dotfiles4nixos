@@ -127,7 +127,7 @@ if [ "$RECONF" = true ] || [ "$DHCP_MODE" = true ]; then
 else
     echo "✅ No network changes detected. Soft refreshing services..."
     sudo systemctl restart sshd
-    echo "🏰 Bastion v2.0: Daily update complete."
+    echo "🏰 Bastion 26.05: Daily update complete."
 fi
 
 echo "------------------------------------------"

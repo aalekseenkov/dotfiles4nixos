@@ -70,9 +70,12 @@
 
   # --- PACKAGES ---
   nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.ansible = {
-    pythonPackages = pkgs: [ pkgs.hvac ];
+  nixpkgs.config.packageOverrides = pkgs: {
+    ansible = pkgs.ansible.overrideAttrs (oldAttrs: {
+      propagatedBuildInputs = oldAttrs.propagatedBuildInputs ++ [ pkgs.python3Packages.hvac ];
+    });
   };
+
   programs.nix-ld.enable = true;
 
   environment.systemPackages = with pkgs; [
