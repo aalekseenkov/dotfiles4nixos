@@ -70,6 +70,9 @@
 
   # --- PACKAGES ---
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.ansible = {
+    pythonPackages = pkgs: [ pkgs.hvac ];
+  };
   programs.nix-ld.enable = true;
 
   environment.systemPackages = with pkgs; [
@@ -98,11 +101,9 @@
     starship
     taplo
     jq
-    # markdown
     marksman
     markdownlint-cli
     python3Packages.grip
-    # go
     go
     gopls
     delve
