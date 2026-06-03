@@ -76,6 +76,8 @@ separator = "│"
 
 [editor.file-picker]
 hidden = false
+git-ignore = false
+parents = false
 
 [keys.normal]
 "esc" = ["collapse_selection", "keep_primary_selection"]
