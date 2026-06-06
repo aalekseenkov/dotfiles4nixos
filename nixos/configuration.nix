@@ -91,6 +91,8 @@
     fastfetch
     ansible
     ansible-lint
+    yamllint
+    pre-commit
     yaml-language-server
     yamlfmt
     sops
@@ -124,6 +126,7 @@
 
   environment.shellAliases = {
     mdview = "grip 0.0.0.0:8080";
+    alint = "yamllint -d \"{extends: default, rules: {line-length: disable, truthy: disable}}\" . && ansible-lint -c .ansible-lint.yml";
   };
 
   # environment.interactiveShellInit = ''
