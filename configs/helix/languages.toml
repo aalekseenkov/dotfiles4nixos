@@ -20,7 +20,7 @@ config = { yaml = { format = { enable = true }, validate = true, schemas = { "ku
 [[language]]
 name = "yaml"
 scope = "source.yaml"
-file-types = ["yml", "yaml", "json"]
+file-types = ["yml", "yaml"]
 auto-format = true
 language-servers = [
   { name = "yaml-language-server" },
@@ -136,9 +136,17 @@ command = "jinja-lsp"
 name = "jinja"
 scope = "source.jinja"
 injection-regex = "jinja"
-file-types = ["jinja", "jinja2", "j2", "html"]
+file-types = ["jinja", "jinja2", "j2"]
 auto-format = true
 language-servers = [{ name = "jinja-lsp" }, { name = "simple-completion-ls" }]
+
+[language-server.superhtml]
+command = "superhtml"
+args = ["lsp"]
+
+[language-server.biome]
+command = "biome"
+args = ["lsp-proxy"]
 
 ###############################################################################
 # INFRASTRUCTURE & SYSTEM ADMINISTRATION
@@ -187,4 +195,41 @@ auto-pairs = { '(' = ')', '{' = '}', '[' = ']', '"' = '"', "'" = "'" }
 [[language]]
 name = "ini"
 scope = "source.ini"
+language-servers = [{ name = "simple-completion-ls" }]
+
+[[language]]
+name = "html"
+scope = "source.html"
+injection-regex = "html"
+file-types = ["html"]
+roots = []
+auto-format = true
+language-servers = [{ name = "superhtml" }, { name = "simple-completion-ls" }]
+
+[[language]]
+name = "css"
+scope = "source.css"
+injection-regex = "css"
+file-types = ["css"]
+roots = ["biome.json"]
+auto-format = true
+language-servers = [{ name = "biome" }, { name = "simple-completion-ls" }]
+
+[[language]]
+name = "javascript"
+scope = "source.js"
+injection-regex = "javascript"
+file-types = ["js", "mjs", "cjs"]
+roots = ["biome.json"]
+auto-format = true
+language-servers = [{ name = "biome" }, { name = "simple-completion-ls" }]
+
+[[language]]
+name = "scss"
+scope = "source.scss"
+injection-regex = "scss"
+file-types = ["scss", "sass"]
+roots = []
+auto-format = true
+formatter = { command = "deno", args = ["fmt", "--ext", "scss", "-"] }
 language-servers = [{ name = "simple-completion-ls" }]

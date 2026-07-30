@@ -106,9 +106,13 @@
     starship
     taplo
     jq
+    tree
     marksman
     markdownlint-cli
     python3Packages.grip
+    superhtml
+    biome
+    deno
     go
     gopls
     delve
