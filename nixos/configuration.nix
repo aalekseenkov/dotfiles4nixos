@@ -72,7 +72,7 @@
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.packageOverrides = pkgs: {
     ansible = pkgs.ansible.overrideAttrs (oldAttrs: {
-      propagatedBuildInputs = oldAttrs.propagatedBuildInputs ++ [ pkgs.python3Packages.hvac ];
+      propagatedBuildInputs = (oldAttrs.propagatedBuildInputs or [ ]) ++ [ pkgs.python313Packages.hvac ];
     });
   };
 
@@ -132,17 +132,6 @@
     mdview = "grip 0.0.0.0:8080";
     alint = "yamllint -d \"{extends: default, rules: {line-length: disable, truthy: disable}}\" . && ansible-lint -c .ansible-lint.yml";
   };
-
-  # environment.interactiveShellInit = ''
-  #   hx() {
-  #     # 1. Set the Helix Background
-  #     echo -ne "\033]11;#3B224C\007"
-  #     # 2. Launch Helix
-  #     command hx "$@"
-  #     # 3. Return Terminal Background
-  #     echo -ne "\033]11;#008080\007"
-  #   }
-  # '';
 
   programs.git = {
     enable = true;
