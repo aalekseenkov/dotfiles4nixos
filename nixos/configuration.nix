@@ -51,6 +51,15 @@
     };
   };
 
+  # --- SSH CLIENT CONFIGURATION ---
+  programs.ssh = {
+    extraConfig = ''
+      Host *
+          ServerAliveInterval 15
+          ServerAliveCountMax 3
+    '';
+  };
+
   # --- USERS ---
   nix.settings.trusted-users = [
     "root"
@@ -98,6 +107,7 @@
     sops
     age
     git
+    git-filter-repo
     lazygit
     glab
     nil
